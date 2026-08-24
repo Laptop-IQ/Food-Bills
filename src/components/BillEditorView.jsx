@@ -35,6 +35,7 @@ export default function BillEditorView({
   storageStatus,
   fontControlProps,
   totals,
+  onTogglePaid,
 }) {
   const { pageBg, cardBg, cardBorder, inputBg, mutedText } = theme;
   const { grandTotal } = totals;
@@ -182,8 +183,21 @@ export default function BillEditorView({
             </div>
 
             <div
-              className={`mt-6 pt-4 border-t ${cardBorder} flex items-center gap-2 flex-wrap`}
+              className={`mt-6 pt-4 border-t ${cardBorder} flex items-center gap-3 flex-wrap`}
             >
+              <label
+                className={`flex items-center gap-2 text-sm font-semibold cursor-pointer select-none ${
+                  bill.paid ? "text-[#c8202c]" : mutedText
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={!!bill.paid}
+                  onChange={onTogglePaid}
+                  className="h-4 w-4 accent-[#c8202c]"
+                />
+                Mark as Paid
+              </label>
               <span className={`text-xs ${mutedText}`}>
                 Buttons upar navbar mein hain ↑
               </span>
