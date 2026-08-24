@@ -31,6 +31,7 @@ export default function ThermalBill() {
     date: getCurrentDateTime(),
     billNo: "FR65/2627/001689",
     orderId: generateOrderId(),
+    paid: false,
   });
   const [items, setItems] = useState(defaultItems);
   const [savedBills, setSavedBills] = useState([]);
@@ -113,6 +114,10 @@ export default function ThermalBill() {
     setItems([...items, { id: Date.now(), name: "", qty: 1, rate: 0 }]);
   const deleteItem = (index) => setItems(items.filter((_, i) => i !== index));
 
+  const togglePaid = () => {
+    setBill((prev) => ({ ...prev, paid: !prev.paid }));
+  };
+
   const startNewBill = () => {
     const { billNo, serial } = getNextBillNo(lastSerial);
     setLastSerial(serial);
@@ -121,6 +126,7 @@ export default function ThermalBill() {
       date: getCurrentDateTime(),
       billNo,
       orderId: generateOrderId(),
+      paid: false,
     });
     setItems(defaultItems);
     setEditingId(null);
@@ -130,7 +136,9 @@ export default function ThermalBill() {
 
   const startEditBill = (saved) => {
     setEditingId(saved.id);
-    setBill(saved.bill);
+    // `paid: false` is a fallback for bills saved before this field existed;
+    // it's overridden by saved.bill.paid whenever that's already present.
+    setBill({ paid: false, ...saved.bill });
     setItems(saved.items);
     setStorageStatus("");
     setView(VIEW.EDITOR);
@@ -210,6 +218,7 @@ export default function ThermalBill() {
         storageStatus={storageStatus}
         fontControlProps={fontControlProps}
         totals={totals}
+        onTogglePaid={togglePaid}
       />
     );
   }
@@ -226,6 +235,7 @@ export default function ThermalBill() {
         onPrintAndSave={printAndSave}
         onSaveOnly={saveBill}
         storageStatus={storageStatus}
+        onTogglePaid={togglePaid}
       />
     );
   }
