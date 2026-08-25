@@ -2,6 +2,9 @@ import React from "react";
 import { convertAmountToWords } from "../utils/utils";
 import PaidStamp from "./PaidStamp";
 
+const hasValue = (v) =>
+  v !== undefined && v !== null && String(v).trim() !== "";
+
 export default function BillReceipt({
   bill,
   items,
@@ -22,27 +25,29 @@ export default function BillReceipt({
       className="relative overflow-hidden bg-white w-[320px] h-auto p-4 shadow-lg text-black inline-block"
       style={{ fontFamily: activeFontCss, fontSize: `${fontSize}px` }}
     >
-      <PaidStamp show={bill.paid} />
-
       <div className="text-center">
         <h1 className="font-bold" style={{ fontSize: `${fontSize * 2}px` }}>
           {bill.title}
         </h1>
-        <p className="font-bold">{bill.branch}</p>
-        <p className="font-bold leading-5">{bill.franchise}</p>
-        <p>{bill.address1}</p>
-        <p>{bill.address2}</p>
-        <p>{bill.city}</p>
-        <p>Contact No: {bill.phone}</p>
-        <p>Email: {bill.email}</p>
-        <p>GST IN {bill.gst}</p>
+        {hasValue(bill.branch) && <p className="font-bold">{bill.branch}</p>}
+        {hasValue(bill.franchise) && (
+          <p className="font-bold leading-5">{bill.franchise}</p>
+        )}
+        {hasValue(bill.address1) && <p>{bill.address1}</p>}
+        {hasValue(bill.address2) && <p>{bill.address2}</p>}
+        {hasValue(bill.city) && <p>{bill.city}</p>}
+        {hasValue(bill.phone) && <p>Contact No: {bill.phone}</p>}
+        {hasValue(bill.email) && <p>Email: {bill.email}</p>}
+        {hasValue(bill.gst) && <p>GST IN {bill.gst}</p>}
         <p>{bill.date}</p>
-        <p
-          className="font-bold mt-1"
-          style={{ fontSize: `${fontSize * 1.5}px` }}
-        >
-          {bill.dine}
-        </p>
+        {hasValue(bill.dine) && (
+          <p
+            className="font-bold mt-1"
+            style={{ fontSize: `${fontSize * 1.5}px` }}
+          >
+            {bill.dine}
+          </p>
+        )}
       </div>
 
       <div className="border-t border-dashed border-black my-2" />
@@ -51,9 +56,11 @@ export default function BillReceipt({
         <p className="font-bold" style={{ fontSize: `${fontSize * 1.5}px` }}>
           Bill No : {bill.billNo}
         </p>
-        <p className="font-bold" style={{ fontSize: `${fontSize * 1.33}px` }}>
-          Order Id: {bill.orderId}
-        </p>
+        {hasValue(bill.orderId) && (
+          <p className="font-bold" style={{ fontSize: `${fontSize * 1.33}px` }}>
+            Order Id: {bill.orderId}
+          </p>
+        )}
       </div>
 
       <div className="border-t border-dashed border-black my-2" />
@@ -62,8 +69,8 @@ export default function BillReceipt({
         className="flex justify-between font-bold"
         style={{ fontSize: `${fontSize * 1.25}px` }}
       >
-        <span>Table: {bill.table}</span>
-        <span>User : {bill.user}</span>
+        {hasValue(bill.table) && <span>Table: {bill.table}</span>}
+        {hasValue(bill.user) && <span>User : {bill.user}</span>}
       </div>
 
       <div className="border-t border-dashed border-black my-2" />
@@ -123,6 +130,8 @@ export default function BillReceipt({
       </div>
 
       <div className="border-t border-dashed border-black my-2" />
+
+      <PaidStamp show={bill.paid} />
 
       <div className="text-center">
         <p>E&amp;OE. Thank you. Visit Again.</p>

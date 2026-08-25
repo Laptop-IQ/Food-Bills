@@ -42,7 +42,7 @@ export default function PaidStamp({ show = true }) {
         fontWeight: 700,
         fontSize: "2.5rem",
         letterSpacing: "0.1em",
-        color: "#1e3a70",
+        color: "#0000cc",
         textShadow:
           "0.6px 0.5px 0 rgba(30,58,112,0.45), -0.5px -0.4px 0 rgba(30,58,112,0.3), 0.3px -0.6px 0 rgba(30,58,112,0.25)",
         whiteSpace: "nowrap",
