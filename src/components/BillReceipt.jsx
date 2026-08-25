@@ -1,5 +1,6 @@
 import React from "react";
 import { convertAmountToWords } from "../utils/utils";
+import PaidStamp from "./PaidStamp";
 
 export default function BillReceipt({
   bill,
@@ -18,9 +19,11 @@ export default function BillReceipt({
   return (
     <div
       id="thermalBill"
-      className="bg-white w-[320px] h-auto p-4 shadow-lg text-black inline-block"
+      className="relative overflow-hidden bg-white w-[320px] h-auto p-4 shadow-lg text-black inline-block"
       style={{ fontFamily: activeFontCss, fontSize: `${fontSize}px` }}
     >
+      <PaidStamp show={bill.paid} />
+
       <div className="text-center">
         <h1 className="font-bold" style={{ fontSize: `${fontSize * 2}px` }}>
           {bill.title}
