@@ -2,163 +2,333 @@ import React from "react";
 import { convertAmountToWords } from "../utils/utils";
 import PaidStamp from "./PaidStamp";
 
-const hasValue = (v) =>
-  v !== undefined && v !== null && String(v).trim() !== "";
+const hasValue = (value) =>
+  value !== undefined && value !== null && String(value).trim() !== "";
 
 export default function BillReceipt({
-  bill,
-  items,
+  bill = {},
+  items = [],
   activeFontCss,
-  fontSize,
-  totals,
+  fontSize = 12,
+  totals = {},
   showActions = true,
   onPrintAndSave,
   onSaveOnly,
   storageStatus,
 }) {
-  const { subtotal, cgst, sgst, grandTotal, roundedAmount, totalQty } = totals;
+  const {
+    subtotal = 0,
+    cgst = 0,
+    sgst = 0,
+    grandTotal = 0,
+    roundedAmount = "0.00",
+    totalQty = 0,
+  } = totals;
+
   const amountInWords = convertAmountToWords(grandTotal);
 
+  const safeSubtotal = Number(subtotal) || 0;
+  const safeCgst = Number(cgst) || 0;
+  const safeSgst = Number(sgst) || 0;
+  const safeGrandTotal = Number(grandTotal) || 0;
+
   return (
-    <div
-      id="thermalBill"
-      className="relative overflow-hidden bg-white w-[320px] h-auto p-4 shadow-lg text-black inline-block"
-      style={{ fontFamily: activeFontCss, fontSize: `${fontSize}px` }}
-    >
-      <div className="text-center">
-        <h1 className="font-bold" style={{ fontSize: `${fontSize * 2}px` }}>
-          {bill.title}
-        </h1>
-        {hasValue(bill.branch) && <p className="font-bold">{bill.branch}</p>}
-        {hasValue(bill.franchise) && (
-          <p className="font-bold leading-5">{bill.franchise}</p>
-        )}
-        {hasValue(bill.address1) && <p>{bill.address1}</p>}
-        {hasValue(bill.address2) && <p>{bill.address2}</p>}
-        {hasValue(bill.city) && <p>{bill.city}</p>}
-        {hasValue(bill.phone) && <p>Contact No: {bill.phone}</p>}
-        {hasValue(bill.email) && <p>Email: {bill.email}</p>}
-        {hasValue(bill.gst) && <p>GST IN {bill.gst}</p>}
-        <p>{bill.date}</p>
-        {hasValue(bill.dine) && (
-          <p
-            className="font-bold mt-1"
-            style={{ fontSize: `${fontSize * 1.5}px` }}
-          >
-            {bill.dine}
-          </p>
-        )}
-      </div>
+    <>
+      {/* =====================================================
+          PRINT STYLES
+      ====================================================== */}
+      <style>
+        {`
+          @media print {
+            @page {
+              size: 80mm auto;
+              margin: 0;
+            }
 
-      <div className="border-t border-dashed border-black my-2" />
+            html,
+            body {
+              margin: 0 !important;
+              padding: 0 !important;
+              width: 80mm !important;
+              background: #fff !important;
+            }
 
-      <div className="text-center">
-        <p className="font-bold" style={{ fontSize: `${fontSize * 1.5}px` }}>
-          Bill No : {bill.billNo}
-        </p>
-        {hasValue(bill.orderId) && (
-          <p className="font-bold" style={{ fontSize: `${fontSize * 1.33}px` }}>
-            Order Id: {bill.orderId}
-          </p>
-        )}
-      </div>
+            body * {
+              visibility: hidden !important;
+            }
 
-      <div className="border-t border-dashed border-black my-2" />
+            #thermalBill,
+            #thermalBill * {
+              visibility: visible !important;
+            }
 
+            #thermalBill {
+              position: absolute !important;
+              left: 0 !important;
+              top: 0 !important;
+              width: 80mm !important;
+              max-width: 80mm !important;
+              min-width: 80mm !important;
+              margin: 0 !important;
+              padding: 4mm !important;
+              box-sizing: border-box !important;
+              overflow: visible !important;
+              box-shadow: none !important;
+              border: none !important;
+              background: #fff !important;
+            }
+
+            #thermalBill .no-print {
+              display: none !important;
+            }
+
+            #thermalBill .print-only {
+              display: block !important;
+            }
+
+            #thermalBill {
+              page-break-after: avoid !important;
+              page-break-before: avoid !important;
+            }
+
+            #thermalBill * {
+              page-break-inside: avoid !important;
+            }
+          }
+
+          @media screen {
+            #thermalBill .print-only {
+              display: none;
+            }
+          }
+        `}
+      </style>
+
+      {/* =====================================================
+          BILL / PRINT VIEW
+      ====================================================== */}
       <div
-        className="flex justify-between font-bold"
-        style={{ fontSize: `${fontSize * 1.25}px` }}
+        id="thermalBill"
+        className="
+          relative
+          mx-auto
+          w-[320px]
+          max-w-full
+          overflow-hidden
+          bg-white
+          p-4
+          text-black
+          shadow-xl
+        "
+        style={{
+          fontFamily: activeFontCss,
+          fontSize: `${fontSize}px`,
+        }}
       >
-        {hasValue(bill.table) && <span>Table: {bill.table}</span>}
-        {hasValue(bill.user) && <span>User : {bill.user}</span>}
-      </div>
+        {/* =========================
+            RESTAURANT HEADER
+        ========================== */}
+        <div className="text-center">
+          {hasValue(bill.title) && (
+            <h1
+              className="font-black leading-tight"
+              style={{
+                fontSize: `${fontSize * 2}px`,
+              }}
+            >
+              {bill.title}
+            </h1>
+          )}
 
-      <div className="border-t border-dashed border-black my-2" />
+          {hasValue(bill.branch) && <p className="font-bold">{bill.branch}</p>}
 
-      <div>
-        <div
-          className="flex font-bold mb-2"
-          style={{ fontSize: `${fontSize * 1.25}px` }}
-        >
-          <div className="w-[50%]">Item</div>
-          <div className="w-[15%] text-center">Qty</div>
-          <div className="w-[15%] text-center">Rate</div>
-          <div className="w-[20%] text-right">Total</div>
-        </div>
-        {items.map((item, index) => (
-          <div key={item.id} className="mb-1">
-            <div className="flex">
-              <div className="w-[50%]">
-                {index + 1}. {item.name}
-              </div>
-              <div className="w-[15%] text-center">{item.qty}</div>
-              <div className="w-[15%] text-center">{item.rate}</div>
-              <div className="w-[20%] text-right">
-                {(item.qty * item.rate).toFixed(1)}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+          {hasValue(bill.franchise) && (
+            <p className="font-bold leading-5">{bill.franchise}</p>
+          )}
 
-      <div className="border-t border-dashed border-black my-2" />
+          {hasValue(bill.address1) && <p>{bill.address1}</p>}
 
-      <div style={{ fontSize: `${fontSize * 1.17}px` }}>
-        <div className="flex justify-between">
-          <div className="flex">
-            <span className="font-bold">Total :</span>
-            <span className="ml-26">{totalQty}</span>
-          </div>
-          <div>Rs {subtotal.toFixed(2)}</div>
-        </div>
-        <div className="flex justify-end mt-1">
-          CGST (2.5%) : Rs {cgst.toFixed(2)}
-        </div>
-        <div className="flex justify-end mt-1">
-          SGST (2.5%) : Rs {sgst.toFixed(2)}
-        </div>
-        <div className="text-right mt-5">
-          <h1
-            className="font-bold"
-            style={{ fontSize: `${fontSize * 1.67}px` }}
-          >
-            Grand Total : Rs {grandTotal.toFixed(2)}
-          </h1>
-          <p className="mt-2">Rounded Amount : {roundedAmount}</p>
-          <p className="italic mt-2 leading-6 capitalize">{amountInWords}</p>
-        </div>
-      </div>
+          {hasValue(bill.address2) && <p>{bill.address2}</p>}
 
-      <div className="border-t border-dashed border-black my-2" />
+          {hasValue(bill.city) && <p>{bill.city}</p>}
 
-      <PaidStamp show={bill.paid} />
+          {hasValue(bill.phone) && <p>Contact No: {bill.phone}</p>}
 
-      <div className="text-center">
-        <p>E&amp;OE. Thank you. Visit Again.</p>
-        <p className="mt-3">Powered by TMBill v7.4.80</p>
-      </div>
+          {hasValue(bill.email) && (
+            <p className="break-all">Email: {bill.email}</p>
+          )}
 
-      {showActions && (
-        <div className="mt-4 flex flex-col gap-2 no-print">
-          <button
-            onClick={onPrintAndSave}
-            className="w-full bg-black text-white py-2 rounded text-lg font-bold"
-          >
-            🖨️ Print &amp; Save Bill
-          </button>
-          <button
-            onClick={onSaveOnly}
-            className="w-full bg-green-600 text-white py-2 rounded text-lg font-bold"
-          >
-            💾 Save Only
-          </button>
-          {storageStatus && (
-            <p className="text-center text-sm font-semibold mt-1">
-              {storageStatus}
+          {hasValue(bill.gst) && <p>GST IN {bill.gst}</p>}
+
+          {hasValue(bill.date) && <p>{bill.date}</p>}
+
+          {hasValue(bill.dine) && (
+            <p
+              className="mt-1 font-black"
+              style={{
+                fontSize: `${fontSize * 1.5}px`,
+              }}
+            >
+              {bill.dine}
             </p>
           )}
         </div>
-      )}
-    </div>
+
+        <div className="my-2 border-t border-dashed border-black" />
+
+        {/* =========================
+            BILL INFO
+        ========================== */}
+        <div className="text-center">
+          {hasValue(bill.billNo) && (
+            <p
+              className="font-black"
+              style={{
+                fontSize: `${fontSize * 1.5}px`,
+              }}
+            >
+              Bill No : {bill.billNo}
+            </p>
+          )}
+
+          {hasValue(bill.orderId) && (
+            <p
+              className="font-bold"
+              style={{
+                fontSize: `${fontSize * 1.33}px`,
+              }}
+            >
+              Order Id: {bill.orderId}
+            </p>
+          )}
+        </div>
+
+        <div className="my-2 border-t border-dashed border-black" />
+
+        {/* =========================
+            TABLE / USER
+        ========================== */}
+        {(hasValue(bill.table) || hasValue(bill.user)) && (
+          <div
+            className="flex justify-between gap-2 font-bold"
+            style={{
+              fontSize: `${fontSize * 1.25}px`,
+            }}
+          >
+            <span className="min-w-0 break-words">
+              {hasValue(bill.table) ? `Table: ${bill.table}` : ""}
+            </span>
+
+            <span className="min-w-0 break-words text-right">
+              {hasValue(bill.user) ? `User: ${bill.user}` : ""}
+            </span>
+          </div>
+        )}
+
+        <div className="my-2 border-t border-dashed border-black" />
+
+        {/* =========================
+            ITEMS
+        ========================== */}
+        <div>
+          <div
+            className="mb-2 flex font-black"
+            style={{
+              fontSize: `${fontSize * 1.15}px`,
+            }}
+          >
+            <div className="w-[50%]">Item</div>
+            <div className="w-[15%] text-center">Qty</div>
+            <div className="w-[15%] text-center">Rate</div>
+            <div className="w-[20%] text-right">Total</div>
+          </div>
+
+          {items.map((item, index) => {
+            const qty = Number(item?.qty) || 0;
+            const rate = Number(item?.rate) || 0;
+            const amount = qty * rate;
+
+            return (
+              <div key={item?.id ?? `item-${index}`} className="mb-1">
+                <div className="flex">
+                  <div className="w-[50%] break-words pr-1">
+                    {index + 1}. {item?.name || "Item"}
+                  </div>
+
+                  <div className="w-[15%] text-center">{qty}</div>
+
+                  <div className="w-[15%] text-center">{rate.toFixed(2)}</div>
+
+                  <div className="w-[20%] text-right">{amount.toFixed(2)}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="my-2 border-t border-dashed border-black" />
+
+        {/* =========================
+            TOTALS
+        ========================== */}
+        <div
+          style={{
+            fontSize: `${fontSize * 1.17}px`,
+          }}
+        >
+          <div className="flex justify-between">
+            <div className="flex gap-5">
+              <span className="font-bold">Total :</span>
+              <span>{totalQty}</span>
+            </div>
+
+            <div>Rs {safeSubtotal.toFixed(2)}</div>
+          </div>
+
+          <div className="mt-1 text-right">
+            CGST (2.5%) : Rs {safeCgst.toFixed(2)}
+          </div>
+
+          <div className="mt-1 text-right">
+            SGST (2.5%) : Rs {safeSgst.toFixed(2)}
+          </div>
+
+          <div className="mt-5 text-right">
+            <h1
+              className="font-black"
+              style={{
+                fontSize: `${fontSize * 1.67}px`,
+              }}
+            >
+              Grand Total : Rs {safeGrandTotal.toFixed(2)}
+            </h1>
+
+            <p className="mt-2">Rounded Amount : {roundedAmount}</p>
+
+            {hasValue(amountInWords) && (
+              <p className="mt-2 italic leading-6 capitalize">
+                {amountInWords}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="my-2 border-t border-dashed border-black" />
+
+        {/* =========================
+            PAID
+        ========================== */}
+        <PaidStamp show={Boolean(bill.paid)} />
+
+        {/* =========================
+            FOOTER
+        ========================== */}
+        <div className="text-center">
+          <p>E&amp;OE. Thank you. Visit Again.</p>
+
+          <p className="mt-3">Powered by TMBill v7.4.80</p>
+        </div>
+      </div>
+    </>
   );
 }
