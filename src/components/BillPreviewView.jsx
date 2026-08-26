@@ -84,10 +84,7 @@ export default function BillPreviewView({
               sm:px-3
             "
           >
-            ←
-            <span className="ml-1.5 hidden text-xs font-bold sm:inline">
-              Editor
-            </span>
+            ← Editor
           </button>
 
           {/* CENTER TITLE */}
@@ -300,9 +297,6 @@ export default function BillPreviewView({
           ================================================== */}
           <div className="no-print mt-5 w-full max-w-[320px]">
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              {/* =====================================================
-      PRINT + SAVE
-  ====================================================== */}
               <button
                 type="button"
                 onClick={onPrintAndSave}

@@ -39,69 +39,172 @@ export default function BillReceipt({
       ====================================================== */}
       <style>
         {`
-          @media print {
-            @page {
-              size: 80mm auto;
-              margin: 0;
-            }
+    @media print {
 
-            html,
-            body {
-              margin: 0 !important;
-              padding: 0 !important;
-              width: 80mm !important;
-              background: #fff !important;
-            }
+      /* ================================
+         THERMAL PAPER
+         ================================ */
+      @page {
+        size: 90mm auto;
+        margin: 0;
+      }
 
-            body * {
-              visibility: hidden !important;
-            }
+      /* ================================
+         PRINT ROOT
+         ================================ */
+      html,
+      body {
+        width: 90mm !important;
+        min-width: 90mm !important;
+        max-width: 90mm !important;
 
-            #thermalBill,
-            #thermalBill * {
-              visibility: visible !important;
-            }
+        margin: 0 !important;
+        padding: 0 !important;
 
-            #thermalBill {
-              position: absolute !important;
-              left: 0 !important;
-              top: 0 !important;
-              width: 80mm !important;
-              max-width: 80mm !important;
-              min-width: 80mm !important;
-              margin: 0 !important;
-              padding: 4mm !important;
-              box-sizing: border-box !important;
-              overflow: visible !important;
-              box-shadow: none !important;
-              border: none !important;
-              background: #fff !important;
-            }
+        background: #fff !important;
 
-            #thermalBill .no-print {
-              display: none !important;
-            }
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
 
-            #thermalBill .print-only {
-              display: block !important;
-            }
+      /* ================================
+         HIDE EVERYTHING
+         ================================ */
+      body * {
+        visibility: hidden !important;
+      }
 
-            #thermalBill {
-              page-break-after: avoid !important;
-              page-break-before: avoid !important;
-            }
+      /* ================================
+         SHOW BILL ONLY
+         ================================ */
+      #thermalBill,
+      #thermalBill * {
+        visibility: visible !important;
+      }
 
-            #thermalBill * {
-              page-break-inside: avoid !important;
-            }
-          }
+      /* ================================
+         THERMAL BILL
+         ================================ */
+      #thermalBill {
+        position: absolute !important;
 
-          @media screen {
-            #thermalBill .print-only {
-              display: none;
-            }
-          }
-        `}
+        left: 0 !important;
+        top: 0 !important;
+
+        width: 80mm !important;
+        min-width: 80mm !important;
+        max-width: 80mm !important;
+
+        margin: 0 !important;
+
+        padding: 4mm !important;
+
+        box-sizing: border-box !important;
+
+        overflow: visible !important;
+
+        background: #fff !important;
+
+        /* Paper border */
+        border: 1px solid #e2e2e2 !important;
+        border-radius: 1px !important;
+
+        /* Right side + bottom paper shadow */
+        box-shadow:
+          2px 0 4px rgba(0, 0, 0, 0.12),
+          0 2px 5px rgba(0, 0, 0, 0.10),
+          0 5px 10px rgba(0, 0, 0, 0.07) !important;
+
+        /* Prevent unwanted transformation */
+        transform: none !important;
+
+        /* Print rendering */
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+
+        /* Prevent page splitting */
+        page-break-before: avoid !important;
+        page-break-after: avoid !important;
+        page-break-inside: avoid !important;
+
+        break-before: avoid !important;
+        break-after: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      /* ================================
+         HIDE NO-PRINT ELEMENTS
+         ================================ */
+      #thermalBill .no-print {
+        display: none !important;
+        visibility: hidden !important;
+      }
+
+      /* ================================
+         SHOW PRINT-ONLY ELEMENTS
+         ================================ */
+      #thermalBill .print-only {
+        display: block !important;
+        visibility: visible !important;
+      }
+
+      /* ================================
+         PREVENT CONTENT SPLITTING
+         ================================ */
+      #thermalBill * {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      /* ================================
+         IMAGES
+         ================================ */
+      #thermalBill img {
+        max-width: 100% !important;
+
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      /* ================================
+         TABLES
+         ================================ */
+      #thermalBill table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      #thermalBill tr,
+      #thermalBill td,
+      #thermalBill th {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      /* ================================
+         TEXT
+         ================================ */
+      #thermalBill p,
+      #thermalBill div,
+      #thermalBill span {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+
+    /* =====================================
+       SCREEN
+       ===================================== */
+    @media screen {
+
+      #thermalBill .print-only {
+        display: none !important;
+      }
+    }
+  `}
       </style>
 
       {/* =====================================================

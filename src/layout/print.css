@@ -6,13 +6,16 @@
   body {
     background: white;
   }
+
   body * {
     visibility: hidden;
   }
+
   #thermalBill,
   #thermalBill * {
     visibility: visible;
   }
+
   .no-print {
     display: none !important;
   }
