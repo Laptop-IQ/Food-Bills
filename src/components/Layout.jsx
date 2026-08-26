@@ -8,10 +8,18 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-[#0A0810]">
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+
       <main
-        className={`min-h-screen pt-14 md:pt-0 transition-all duration-300 ease-in-out ${
-          collapsed ? "md:pl-[84px]" : "md:pl-[264px]"
-        }`}
+        className={`
+          min-h-screen
+          pt-14
+          md:pt-0
+          transition-[padding]
+          duration-300
+          ease-in-out
+
+          ${collapsed ? "md:pl-[84px]" : "md:pl-[264px]"}
+        `}
       >
         <Outlet />
       </main>

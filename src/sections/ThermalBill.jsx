@@ -382,14 +382,7 @@ export default function ThermalBill() {
       setStorageStatus("");
       setView(VIEW.EDITOR);
 
-      showToast({
-        type: "info",
-        title: "Bill loaded",
-        message: "You can now edit this saved bill.",
-        duration: 2200,
-      });
     },
-    [showToast],
   );
 
   /* ─────────────────────────────────────────────
