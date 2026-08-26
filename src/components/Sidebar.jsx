@@ -121,14 +121,14 @@ export default function Sidebar({ collapsed, setCollapsed }) {
       {/* Mobile top bar */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-[#13111C]/95 backdrop-blur-xl border-b border-white/[0.06] z-30 flex items-center justify-between px-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#8B72FF] to-[#4530A8] flex items-center justify-center text-white font-bold text-xs">
-            SD
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#bcb9c6] to-[#4530A8] flex items-center justify-center text-white font-bold text-xs">
+            SK
           </div>
           <span
             style={FRAUNCES}
             className="text-[#F3F1FA] font-semibold text-sm"
           >
-            SF Dyes
+            Bill Gen
           </span>
         </div>
         <button
@@ -171,7 +171,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
                 style={FRAUNCES}
                 className="text-[#F3F1FA] font-semibold text-[16px] leading-tight tracking-tight truncate"
               >
-                Market
+                Bill Gen
               </p>
               <p className="text-slate-500 text-[11px] truncate">
                 Expense Manager

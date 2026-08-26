@@ -17,9 +17,6 @@ export default function SFDyesToolbar({
         >
           ← Back
         </button>
-        <p className="text-sm font-black tracking-widest text-white drop-shadow">
-          SF DYES — EXPENSE FORM
-        </p>
       </div>
 
       {/* Right: action buttons */}
