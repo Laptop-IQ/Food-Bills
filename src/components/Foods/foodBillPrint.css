@@ -21,18 +21,6 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-input {
-  color: #000 !important;
-}
-
-* {
-  -webkit-text-fill-color: #000;
-}
-
-input:focus,
-input:hover {
-  -webkit-text-fill-color: #000;
-}
 
 
 @media print {
@@ -78,18 +66,6 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-input {
-  color: #000 !important;
-}
-
-* {
-  -webkit-text-fill-color: #000;
-}
-
-input:focus,
-input:hover {
-  -webkit-text-fill-color: #000;
-}
 
 /* ---------- Print ---------- */
 @media print {
