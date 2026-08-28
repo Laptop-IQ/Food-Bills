@@ -108,7 +108,9 @@ function ChevronIcon(props) {
 const navItems = [
   { to: "/", label: "Thermal Bill", icon: ReceiptIcon, end: true },
   { to: "/expense", label: "Hotel Expense", icon: BriefcaseIcon, end: false },
+  { to: "/tax-invoice", label: "Hotel Bills", icon: BriefcaseIcon, end: false },
   { to: "/foodbill", label: "Food Bill", icon: CoffeeIcon, end: false },
+  { to: "/hotels-invoice", label: "Air Bill", icon: CoffeeIcon, end: false },
 ];
 
 const FRAUNCES = { fontFamily: "'Fraunces', ui-serif, Georgia, serif" };
