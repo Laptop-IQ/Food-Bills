@@ -296,109 +296,210 @@ function handlePrint() {
             EDITOR
         ================================================= */}
 
-        <section className="no-print mx-auto mb-4 w-full max-w-[210mm] rounded-lg border border-gray-200 bg-white p-[18px] shadow-sm">
-          <h2 className="m-0 text-[19px] font-bold text-black">Edit Tax Invoice</h2>
+<section
+  className="
+    no-print
+    mx-auto
+    mb-4
+    w-full
+    max-w-[1000px]
+    rounded-lg
+    border
+    border-gray-200
+    bg-white
+    px-6
+    py-4
+    shadow-sm
+  "
+>
+  <div
+    className="
+      grid
+      grid-cols-[65px_195px_1fr_95px]
+      items-start
+      gap-x-4
+    "
+  >
+    {/* =========================================
+        TITLE
+    ========================================= */}
+    <div className="pt-1">
+      <h2 className="m-0 text-[19px] font-bold leading-[1.8] text-black">
+        Edit
+        <br />
+        Tax
+        <br />
+        Invoice
+      </h2>
+    </div>
 
-          <p className="mb-[18px] mt-[5px] text-[12px] text-gray-500">
-            Update the fields below. Changes will immediately appear in the
-            invoice preview.
-          </p>
+    {/* =========================================
+        DESCRIPTION
+    ========================================= */}
+    <div className="pt-1">
+      <p className="m-0 text-[12px] leading-[1.5] text-gray-500">
+        Update the fields below.
+        <br />
+        Changes will immediately
+        <br />
+        appear in the invoice preview.
+      </p>
+    </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <EditField
-              label="Customer Name"
-              value={invoice.customerName}
-              error={errors.customerName}
-              onChange={(value) => {
-                setInvoice((current) => ({
-                  ...current,
-                  customerName: value,
-                  passengerName: value,
-                }));
+    {/* =========================================
+        FIELDS
+    ========================================= */}
+    <div className="grid grid-cols-4 gap-x-4 gap-y-3">
 
-                setErrors((current) => {
-                  const next = { ...current };
-                  delete next.customerName;
-                  delete next.passengerName;
-                  return next;
-                });
-              }}
-            />
-            <EditField
-              label="Booked By"
-              value={invoice.bookedBy}
-              error={errors.bookedBy}
-              onChange={(value) => updateField("bookedBy", value)}
-            />
-            <EditField
-              label="PNR"
-              value={invoice.pnr}
-              error={errors.pnr}
-              onChange={(value) => updateField("pnr", value.toUpperCase())}
-            />
-            <EditField
-              label="Fare Charges"
-              type="number"
-              value={invoice.fareCharges}
-              error={errors.fareCharges}
-              onChange={(value) => updateField("fareCharges", value)}
-            />
-            <EditField
-              label="Date"
-              type="date"
-              value={invoice.date}
-              error={errors.date}
-              onChange={(value) => updateField("date", value)}
-            />
-            <EditField
-              label="Invoice No."
-              value={invoice.invoiceNo}
-              error={errors.invoiceNo}
-              onChange={(value) =>
-                updateField("invoiceNo", value.toUpperCase())
-              }
-            />
-            <EditField
-              label="Booking ID"
-              value={invoice.bookingId}
-              onChange={(value) =>
-                updateField("bookingId", value.toUpperCase())
-              }
-            />
-            <EditField
-              label="Flight Route"
-              value={invoice.flightRoute}
-              onChange={(value) => updateField("flightRoute", value)}
-            />
-          </div>
+      <EditField
+        label="Customer Name"
+        value={invoice.customerName}
+        error={errors.customerName}
+        onChange={(value) => {
+          setInvoice((current) => ({
+            ...current,
+            customerName: value,
+            passengerName: value,
+          }));
 
-          <div className="mt-[18px] flex items-center justify-between gap-4 border-t border-gray-100 pt-[15px] max-sm:flex-col max-sm:items-stretch">
-            <div className="text-[13px] text-gray-600">
-              Grand Total:{" "}
-              <strong className="text-black">
-                ₹{formatCurrency(grandTotal)}
-              </strong>
-            </div>
+          setErrors((current) => {
+            const next = { ...current };
+            delete next.customerName;
+            delete next.passengerName;
+            return next;
+          });
+        }}
+      />
 
-            <div className="flex gap-2 max-sm:w-full">
-              <button
-                type="button"
-                onClick={handleReset}
-                className="h-[38px] rounded-md border border-gray-300 bg-white px-[17px] text-[12px] font-bold text-gray-800 hover:bg-gray-50 max-sm:flex-1"
-              >
-                Reset
-              </button>
+      <EditField
+        label="Booked By"
+        value={invoice.bookedBy}
+        error={errors.bookedBy}
+        onChange={(value) =>
+          updateField("bookedBy", value)
+        }
+      />
 
-              <button
-                type="button"
-                onClick={handlePrint}
-                className="h-[38px] rounded-md border border-black bg-black px-[17px] text-[12px] font-bold text-white hover:bg-gray-800 max-sm:flex-1"
-              >
-                Print Tax Invoice
-              </button>
-            </div>
-          </div>
-        </section>
+      <EditField
+        label="PNR"
+        value={invoice.pnr}
+        error={errors.pnr}
+        onChange={(value) =>
+          updateField("pnr", value.toUpperCase())
+        }
+      />
+
+      <EditField
+        label="Fare Charges"
+        type="number"
+        value={invoice.fareCharges}
+        error={errors.fareCharges}
+        onChange={(value) =>
+          updateField("fareCharges", value)
+        }
+      />
+
+      <EditField
+        label="Date"
+        type="date"
+        value={invoice.date}
+        error={errors.date}
+        onChange={(value) =>
+          updateField("date", value)
+        }
+      />
+
+      <EditField
+        label="Invoice No."
+        value={invoice.invoiceNo}
+        error={errors.invoiceNo}
+        onChange={(value) =>
+          updateField(
+            "invoiceNo",
+            value.toUpperCase()
+          )
+        }
+      />
+
+      <EditField
+        label="Booking ID"
+        value={invoice.bookingId}
+        onChange={(value) =>
+          updateField(
+            "bookingId",
+            value.toUpperCase()
+          )
+        }
+      />
+
+      <EditField
+        label="Flight Route"
+        value={invoice.flightRoute}
+        onChange={(value) =>
+          updateField(
+            "flightRoute",
+            value.toUpperCase()
+          )
+        }
+      />
+    </div>
+
+    {/* =========================================
+        RIGHT SIDE TOTAL + BUTTONS
+    ========================================= */}
+    <div className="flex h-full flex-col justify-end gap-2 pt-[76px]">
+
+      <div className="text-[13px] leading-[1.25] text-gray-600">
+        Grand
+        <br />
+        Total:
+        <strong className="ml-1 whitespace-nowrap text-black">
+          ₹{formatCurrency(grandTotal)}
+        </strong>
+      </div>
+
+      <button
+        type="button"
+        onClick={handleReset}
+        className="
+          h-[38px]
+          rounded-md
+          border
+          border-gray-300
+          bg-white
+          px-4
+          text-[12px]
+          font-bold
+          text-gray-800
+          hover:bg-gray-50
+        "
+      >
+        Reset
+      </button>
+
+      <button
+        type="button"
+        onClick={handlePrint}
+        className="
+          h-[38px]
+          rounded-md
+          border
+          border-black
+          bg-black
+          px-4
+          text-[12px]
+          font-bold
+          text-white
+          hover:bg-gray-800
+        "
+      >
+        Print
+        <br />
+        Tax
+      </button>
+    </div>
+  </div>
+</section>
 
         {/* =================================================
             A4 INVOICE
@@ -418,7 +519,7 @@ function handlePrint() {
               <img
                 src="/makemytrip-logo.png"
                 alt="MakeMyTrip"
-                className="block h-[651px] w-auto object-contain"
+                className="block h-[42px] w-auto object-contain"
               />
             </div>
 
