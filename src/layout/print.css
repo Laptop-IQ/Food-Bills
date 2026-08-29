@@ -1,6 +1,4 @@
-.no-print {
-  display: flex;
-}
+
 
 @media print {
   body {

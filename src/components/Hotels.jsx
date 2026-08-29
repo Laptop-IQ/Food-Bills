@@ -404,7 +404,7 @@ const { grandTotal, cgstAmount, sgstAmount } = useMemo(() => {
               <img
                 src="/makemytrip-logo.png"
                 alt="MakeMyTrip"
-                className="block h-[651px] w-auto object-contain"
+                className="block h-[65px] w-auto object-contain"
               />
             </div>
 
