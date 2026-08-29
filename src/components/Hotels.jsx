@@ -33,8 +33,8 @@ const INITIAL_INVOICE = {
 
   hotelName: "Best Western Morrion Hotel",
   hotelCity: "AMRITSAR",
-  checkIn: "2025-09-26",
-  checkOut: "2025-09-28",
+  checkIn: "2026-09-26",
+  checkOut: "2026-09-28",
   roomType: "Deluxe Room",
 
   guestName: "Rahul Sharma",

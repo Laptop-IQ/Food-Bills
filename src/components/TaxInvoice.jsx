@@ -14,7 +14,7 @@ const INITIAL_INVOICE = {
 
   bookingId: "NF2AGZRS94485560284",
   invoiceNo: "M06AI26111704220",
-  date: "2025-09-26",
+  date: "2026-09-26",
 
   placeOfSupply: "Haryana",
   transactionType: "B2C/REG",
@@ -40,9 +40,9 @@ const INITIAL_INVOICE = {
   pnr: "T9XMPL",
 
   fareCharges: "4500.00",
-  serviceFees: "300.00",
-  cgst: "27.00",
-  sgst: "27.00",
+  serviceFees: "0.00",
+  cgst: "0.00",
+  sgst: "0.00",
 
   fareDescription:
     "(including applicable flight taxes collected on behalf of airline & other ancillary charges)",
@@ -163,17 +163,24 @@ export default function TaxInvoice() {
      TOTAL
   ======================================================= */
 
-  const grandTotal = useMemo(() => {
-    const fare = parseFloat(invoice.fareCharges) || 0;
+const taxableAmount = useMemo(() => {
+  const fare = parseFloat(invoice.fareCharges) || 0;
+  const service = parseFloat(invoice.serviceFees) || 0;
 
-    const service = parseFloat(invoice.serviceFees) || 0;
+  return fare + service;
+}, [invoice.fareCharges, invoice.serviceFees]);
 
-    const cgst = parseFloat(invoice.cgst) || 0;
+const cgstAmount = useMemo(() => {
+  return taxableAmount * 0.09;
+}, [taxableAmount]);
 
-    const sgst = parseFloat(invoice.sgst) || 0;
+const sgstAmount = useMemo(() => {
+  return taxableAmount * 0.09;
+}, [taxableAmount]);
 
-    return fare + service + cgst + sgst;
-  }, [invoice.fareCharges, invoice.serviceFees, invoice.cgst, invoice.sgst]);
+const grandTotal = useMemo(() => {
+  return taxableAmount + cgstAmount + sgstAmount;
+}, [taxableAmount, cgstAmount, sgstAmount]);
 
   /* =======================================================
      VALIDATION
@@ -297,7 +304,9 @@ function handlePrint() {
         ================================================= */}
 
         <section className="no-print mx-auto mb-4 w-full max-w-[210mm] rounded-lg border border-gray-200 bg-white p-[18px] shadow-sm">
-          <h2 className="m-0 text-[19px] font-bold text-black">Edit Tax Invoice</h2>
+          <h2 className="m-0 text-[19px] font-bold text-black">
+            Edit Tax Invoice
+          </h2>
 
           <p className="mb-[18px] mt-[5px] text-[12px] text-gray-500">
             Update the fields below. Changes will immediately appear in the
@@ -342,6 +351,13 @@ function handlePrint() {
               value={invoice.fareCharges}
               error={errors.fareCharges}
               onChange={(value) => updateField("fareCharges", value)}
+            />
+            <EditField
+              label="Service Fees"
+              type="number"
+              value={invoice.serviceFees}
+              error={errors.serviceFees}
+              onChange={(value) => updateField("serviceFees", value)}
             />
             <EditField
               label="Date"
@@ -626,10 +642,9 @@ function handlePrint() {
               </span>
 
               <span className="break-words text-[11px] font-bold leading-[1.2] text-black">
-                ₹{formatCurrency(invoice.cgst)}
+                ₹{formatCurrency(cgstAmount)}
               </span>
             </div>
-
             {/* SGST */}
 
             <div className="flex min-h-[25px] items-center justify-between gap-4 border-b-2 border-[#222] px-[10px] py-[4px]">
@@ -638,7 +653,7 @@ function handlePrint() {
               </span>
 
               <span className="break-words text-[11px] font-bold leading-[1.2] text-black">
-                ₹{formatCurrency(invoice.sgst)}
+                ₹{formatCurrency(sgstAmount)}
               </span>
             </div>
 
