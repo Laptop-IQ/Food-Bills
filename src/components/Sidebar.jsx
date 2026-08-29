@@ -74,15 +74,15 @@ const navItems = [
     end: false,
   },
   {
-    to: "/foodbill",
-    label: "Food Bill",
-    icon: CoffeeIcon,
-    end: false,
-  },
-  {
     to: "/hotels-invoice",
     label: "Hotel Bill",
     icon: HotelIcon,
+    end: false,
+  },
+  {
+    to: "/foodbill",
+    label: "Food Bill",
+    icon: CoffeeIcon,
     end: false,
   },
   {

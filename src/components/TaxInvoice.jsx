@@ -52,7 +52,8 @@ const INITIAL_INVOICE = {
 
   invalidDocument: "This is not a valid travel document",
 
-  qrVerificationUrl: "https://einvoice1.gst.gov.in/Others/QRCodeVerifyApp",
+  qrVerificationUrl:
+    "https://einvoice1.gst.gov.in/Others/QRCodeVerifyApp",
 };
 
 /* =========================================================
@@ -85,12 +86,17 @@ function formatInvoiceDate(value) {
   });
 }
 
-
 /* =========================================================
    EDIT FIELD
 ========================================================= */
 
-function EditField({ label, value, onChange, type = "text", error }) {
+function EditField({
+  label,
+  value,
+  onChange,
+  type = "text",
+  error,
+}) {
   return (
     <div className="min-w-0">
       <label className="mb-1 block text-[11px] font-bold text-gray-600">
@@ -110,7 +116,11 @@ function EditField({ label, value, onChange, type = "text", error }) {
         ].join(" ")}
       />
 
-      {error && <p className="mt-1 text-[10px] text-red-600">{error}</p>}
+      {error && (
+        <p className="mt-1 text-[10px] text-red-600">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -126,7 +136,7 @@ function InfoItem({ label, value, children }) {
         {label}
       </div>
 
-      <div className="wrap-break-word text-[11px] font-bold leading-[1.18] text-black">
+      <div className="break-words text-[11px] font-bold leading-[1.18] text-black">
         {children !== undefined ? children : value}
       </div>
     </div>
@@ -139,7 +149,6 @@ function InfoItem({ label, value, children }) {
 
 export default function TaxInvoice() {
   const [invoice, setInvoice] = useState(INITIAL_INVOICE);
-
   const [errors, setErrors] = useState({});
 
   /* =======================================================
@@ -163,24 +172,24 @@ export default function TaxInvoice() {
      TOTAL
   ======================================================= */
 
-const taxableAmount = useMemo(() => {
-  const fare = parseFloat(invoice.fareCharges) || 0;
-  const service = parseFloat(invoice.serviceFees) || 0;
+  const taxableAmount = useMemo(() => {
+    const fare = parseFloat(invoice.fareCharges) || 0;
+    const service = parseFloat(invoice.serviceFees) || 0;
 
-  return fare + service;
-}, [invoice.fareCharges, invoice.serviceFees]);
+    return fare + service;
+  }, [invoice.fareCharges, invoice.serviceFees]);
 
-const cgstAmount = useMemo(() => {
-  return taxableAmount * 0.09;
-}, [taxableAmount]);
+  const cgstAmount = useMemo(() => {
+    return taxableAmount * 0.09;
+  }, [taxableAmount]);
 
-const sgstAmount = useMemo(() => {
-  return taxableAmount * 0.09;
-}, [taxableAmount]);
+  const sgstAmount = useMemo(() => {
+    return taxableAmount * 0.09;
+  }, [taxableAmount]);
 
-const grandTotal = useMemo(() => {
-  return taxableAmount + cgstAmount + sgstAmount;
-}, [taxableAmount, cgstAmount, sgstAmount]);
+  const grandTotal = useMemo(() => {
+    return taxableAmount + cgstAmount + sgstAmount;
+  }, [taxableAmount, cgstAmount, sgstAmount]);
 
   /* =======================================================
      VALIDATION
@@ -215,7 +224,11 @@ const grandTotal = useMemo(() => {
 
     const fare = parseFloat(invoice.fareCharges);
 
-    if (invoice.fareCharges === "" || Number.isNaN(fare) || fare < 0) {
+    if (
+      invoice.fareCharges === "" ||
+      Number.isNaN(fare) ||
+      fare < 0
+    ) {
       newErrors.fareCharges = "Enter a valid fare amount.";
     }
 
@@ -228,77 +241,167 @@ const grandTotal = useMemo(() => {
      PRINT
   ======================================================= */
 
-function handlePrint() {
-  if (!validateInvoice()) return;
+  function handlePrint() {
+    if (!validateInvoice()) {
+      return;
+    }
 
-  const originalTitle = document.title;
+    const originalTitle = document.title;
 
-  // PDF / Print filename
-  document.title = `Air Ticket - ${invoice.invoiceNo}`;
+    document.title = `Air Ticket - ${invoice.invoiceNo}`;
 
-  window.print();
+    // Browser ko print layout calculate karne ka time
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.print();
 
-  // Print dialog close hone ke baad original title restore
-  setTimeout(() => {
-    document.title = originalTitle;
-  }, 1000);
-}
-
+        // Print dialog close hone ke baad title restore
+        setTimeout(() => {
+          document.title = originalTitle;
+        }, 1000);
+      });
+    });
+  }
 
   /* =======================================================
      RESET
   ======================================================= */
 
   function handleReset() {
-    setInvoice({
-      ...INITIAL_INVOICE,
-    });
-
+    setInvoice({ ...INITIAL_INVOICE });
     setErrors({});
   }
 
   return (
     <>
       {/* ===================================================
-          PRINT ONLY CSS
+          PRINT CSS
       =================================================== */}
 
       <style>{`
+        * {
+          box-sizing: border-box;
+        }
+
+        html,
+        body,
+        #root {
+          margin: 0;
+          padding: 0;
+        }
+
+        body {
+          background: #e9e9e9;
+        }
+
         @page {
-          size: A4;
+          size: A4 portrait;
           margin: 0;
         }
 
+        /*
+         * IMPORTANT:
+         * Print ke waqt browser sirf invoice ko render karega.
+         * Isse blank print preview ka issue avoid hota hai.
+         */
+
         @media print {
           html,
-          body,
-          #root {
+          body {
             width: 210mm !important;
             min-width: 210mm !important;
-            height: 297mm !important;
-            min-height: 297mm !important;
             margin: 0 !important;
             padding: 0 !important;
-            background: white !important;
+            background: #fff !important;
           }
 
-          .no-print {
-            display: none !important;
+          body {
+            overflow: visible !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
 
+          /*
+           * Screen ke saare elements hidden.
+           */
+          body * {
+            visibility: hidden !important;
+          }
+
+          /*
+           * Sirf invoice aur uske children visible.
+           */
+          .invoice-page,
+          .invoice-page * {
+            visibility: visible !important;
+          }
+
+          /*
+           * Invoice ko page ke exact top-left par place karo.
+           */
           .invoice-page {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+
+            display: block !important;
+
             width: 210mm !important;
             height: 297mm !important;
+
+            min-width: 210mm !important;
             min-height: 297mm !important;
+
+            max-width: 210mm !important;
+            max-height: 297mm !important;
+
             margin: 0 !important;
-            box-shadow: none !important;
+            padding: 10mm 11mm 18mm 11mm !important;
+
+            background: #fff !important;
+
             border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+
             overflow: hidden !important;
+
+            page-break-before: avoid !important;
+            page-break-after: avoid !important;
+            page-break-inside: avoid !important;
+
+            break-before: avoid-page !important;
+            break-after: avoid-page !important;
+            break-inside: avoid-page !important;
+          }
+
+          .invoice-page img {
+            visibility: visible !important;
+            max-width: 100% !important;
+
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          .invoice-page a {
+            color: #000 !important;
+            text-decoration: underline !important;
+          }
+
+          .invoice-page a::after {
+            content: none !important;
+          }
+
+          /*
+           * Print ke waqt external/editor section nahi chahiye.
+           */
+          .no-print {
+            display: none !important;
           }
         }
       `}</style>
 
-      <div className="min-h-screen bg-[#e9e9e9] p-6 print:bg-white print:p-0">
+      <div className="min-h-screen bg-[#e9e9e9] p-6">
         {/* =================================================
             EDITOR
         ================================================= */}
@@ -309,8 +412,8 @@ function handlePrint() {
           </h2>
 
           <p className="mb-[18px] mt-[5px] text-[12px] text-gray-500">
-            Update the fields below. Changes will immediately appear in the
-            invoice preview.
+            Update the fields below. Changes will immediately
+            appear in the invoice preview.
           </p>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -333,39 +436,54 @@ function handlePrint() {
                 });
               }}
             />
+
             <EditField
               label="Booked By"
               value={invoice.bookedBy}
               error={errors.bookedBy}
-              onChange={(value) => updateField("bookedBy", value)}
+              onChange={(value) =>
+                updateField("bookedBy", value)
+              }
             />
+
             <EditField
               label="PNR"
               value={invoice.pnr}
               error={errors.pnr}
-              onChange={(value) => updateField("pnr", value.toUpperCase())}
+              onChange={(value) =>
+                updateField("pnr", value.toUpperCase())
+              }
             />
+
             <EditField
               label="Fare Charges"
               type="number"
               value={invoice.fareCharges}
               error={errors.fareCharges}
-              onChange={(value) => updateField("fareCharges", value)}
+              onChange={(value) =>
+                updateField("fareCharges", value)
+              }
             />
+
             <EditField
               label="Service Fees"
               type="number"
               value={invoice.serviceFees}
-              error={errors.serviceFees}
-              onChange={(value) => updateField("serviceFees", value)}
+              onChange={(value) =>
+                updateField("serviceFees", value)
+              }
             />
+
             <EditField
               label="Date"
               type="date"
               value={invoice.date}
               error={errors.date}
-              onChange={(value) => updateField("date", value)}
+              onChange={(value) =>
+                updateField("date", value)
+              }
             />
+
             <EditField
               label="Invoice No."
               value={invoice.invoiceNo}
@@ -374,6 +492,7 @@ function handlePrint() {
                 updateField("invoiceNo", value.toUpperCase())
               }
             />
+
             <EditField
               label="Booking ID"
               value={invoice.bookingId}
@@ -381,10 +500,13 @@ function handlePrint() {
                 updateField("bookingId", value.toUpperCase())
               }
             />
+
             <EditField
               label="Flight Route"
               value={invoice.flightRoute}
-              onChange={(value) => updateField("flightRoute", value)}
+              onChange={(value) =>
+                updateField("flightRoute", value)
+              }
             />
           </div>
 
@@ -420,25 +542,45 @@ function handlePrint() {
             A4 INVOICE
         ================================================= */}
 
-        <main className="invoice-page relative mx-auto h-[297mm] min-h-[297mm] w-[210mm] overflow-hidden bg-white px-[11mm] pb-[18mm] pt-[10mm] shadow-[0_2px_12px_rgba(0,0,0,0.12)] print:shadow-none">
+        <main
+          className="
+            invoice-page
+            relative
+            mx-auto
+            h-[297mm]
+            min-h-[297mm]
+            w-[210mm]
+            overflow-hidden
+            bg-white
+            px-[11mm]
+            pb-[18mm]
+            pt-[10mm]
+            shadow-[0_2px_12px_rgba(0,0,0,0.12)]
+          "
+        >
+          {/* HEADER */}
+
           <section className="grid grid-cols-[1fr_1fr_1.15fr] items-start gap-x-[86px]">
             {/* LEFT */}
+
             <div>
-              <h1 className="m-0 mt-3 text-[25px] text-black font-bold leading-none tracking-[-0.6px]">
+              <h1 className="m-0 mt-3 text-[25px] font-bold leading-none tracking-[-0.6px] text-black">
                 TAX INVOICE
               </h1>
             </div>
 
-            {/* CENTER — MakeMyTrip Logo */}
+            {/* CENTER LOGO */}
+
             <div className="flex h-[55px] items-center justify-center">
               <img
                 src="/makemytrip-logo.png"
                 alt="MakeMyTrip"
-                className="block h-[651px] w-auto object-contain"
+                className="block h-[65px] w-auto object-contain"
               />
             </div>
 
             {/* RIGHT */}
+
             <div className="min-w-0">
               <div className="text-[10px] leading-[1.15] text-[#444]">
                 {invoice.companyName}
@@ -448,23 +590,39 @@ function handlePrint() {
                 {invoice.addressLines.map((line, index) => (
                   <React.Fragment key={index}>
                     {line}
-                    {index < invoice.addressLines.length - 1 && <br />}
+                    {index <
+                      invoice.addressLines.length - 1 && <br />}
                   </React.Fragment>
                 ))}
               </div>
             </div>
           </section>
 
+          {/* INFORMATION */}
+
           <section className="mt-[18px] grid grid-cols-[1fr_1fr_1fr] gap-x-[98px]">
             {/* COLUMN 1 */}
+
             <div className="flex flex-col gap-3.5">
-              <InfoItem label="Booking ID" value={invoice.bookingId} />
+              <InfoItem
+                label="Booking ID"
+                value={invoice.bookingId}
+              />
 
-              <InfoItem label="Invoice No." value={invoice.invoiceNo} />
+              <InfoItem
+                label="Invoice No."
+                value={invoice.invoiceNo}
+              />
 
-              <InfoItem label="Date" value={formatInvoiceDate(invoice.date)} />
+              <InfoItem
+                label="Date"
+                value={formatInvoiceDate(invoice.date)}
+              />
 
-              <InfoItem label="Place of Supply" value={invoice.placeOfSupply} />
+              <InfoItem
+                label="Place of Supply"
+                value={invoice.placeOfSupply}
+              />
 
               <InfoItem
                 label="Transactional Type/Category"
@@ -476,24 +634,43 @@ function handlePrint() {
                 value={invoice.transactionDetails}
               />
             </div>
+
             {/* COLUMN 2 */}
+
             <div className="flex flex-col gap-3.5">
-              <InfoItem label="PAN" value={invoice.pan} />
+              <InfoItem
+                label="PAN"
+                value={invoice.pan}
+              />
 
-              <InfoItem label="HSN/SAC" value={invoice.hsnSac} />
+              <InfoItem
+                label="HSN/SAC"
+                value={invoice.hsnSac}
+              />
 
-              <InfoItem label="GSTIN" value={invoice.gstin} />
+              <InfoItem
+                label="GSTIN"
+                value={invoice.gstin}
+              />
 
-              <InfoItem label="CIN" value={invoice.cin} />
+              <InfoItem
+                label="CIN"
+                value={invoice.cin}
+              />
 
               <InfoItem label="Service Description">
                 <div>
-                  {invoice.serviceDescription.map((line, index) => (
-                    <React.Fragment key={index}>
-                      {line}
-                      {index < invoice.serviceDescription.length - 1 && <br />}
-                    </React.Fragment>
-                  ))}
+                  {invoice.serviceDescription.map(
+                    (line, index) => (
+                      <React.Fragment key={index}>
+                        {line}
+                        {index <
+                          invoice.serviceDescription.length - 1 && (
+                          <br />
+                        )}
+                      </React.Fragment>
+                    )
+                  )}
                 </div>
               </InfoItem>
 
@@ -502,9 +679,9 @@ function handlePrint() {
                 value={invoice.taxPayableRCM}
               />
             </div>
-            {/* COLUMN 3
-                QR STARTS EXACTLY WITH BOOKING ID/PAN
-            */}
+
+            {/* COLUMN 3 / QR */}
+
             <div className="flex items-start justify-center pt-[31px]">
               <div className="flex h-[180px] w-[180px] items-center justify-center">
                 <img
@@ -516,9 +693,7 @@ function handlePrint() {
             </div>
           </section>
 
-          {/* =================================================
-              CUSTOMER
-          ================================================= */}
+          {/* CUSTOMER */}
 
           <section className="mt-[18px] grid grid-cols-2 border-y-2 border-dotted border-[#100101] py-[9px]">
             <div className="pr-5">
@@ -526,29 +701,31 @@ function handlePrint() {
                 Customer Name
               </div>
 
-              <div className="wrap-break-word text-[11px] mb-2 font-bold leading-[1.2] text-black">
+              <div className="mb-2 break-words text-[11px] font-bold leading-[1.2] text-black">
                 {invoice.customerName}
               </div>
             </div>
 
             <div className="pl-5">
-              <div className="mb-[3px] text-[10px] text-[#666]">Booked By</div>
+              <div className="mb-[3px] text-[10px] text-[#666]">
+                Booked By
+              </div>
 
-              <div className="wrap-break-word text-[11px] font-bold leading-[1.2] text-black">
+              <div className="break-words text-[11px] font-bold leading-[1.2] text-black">
                 {invoice.bookedBy}
               </div>
             </div>
           </section>
 
-          {/* =================================================
-              FLIGHT
-          ================================================= */}
+          {/* FLIGHT */}
 
           <section className="mt-3 overflow-hidden rounded-[9px] border-2 border-[#222]">
             <div className="flex min-h-[25px] items-center justify-between gap-4 border-b-2 border-[#222] px-3 py-1 text-[10.5px] font-bold">
-              <span className="wrap-break-word text-[11px] font-bold leading-[1.2] text-black">
-                {invoice.flightRoute} ({formatInvoiceDate(invoice.date)})
+              <span className="break-words text-[11px] font-bold leading-[1.2] text-black">
+                {invoice.flightRoute} (
+                {formatInvoiceDate(invoice.date)})
               </span>
+
               <span className="mb-1 text-[10px] text-[#777]">
                 {invoice.flightNumber}
               </span>
@@ -560,7 +737,7 @@ function handlePrint() {
                   Passenger Name(s)
                 </div>
 
-                <div className="wrap-break-word text-[11px] font-bold leading-[1.2] text-black">
+                <div className="break-words text-[11px] font-bold leading-[1.2] text-black">
                   {invoice.passengerName}
                 </div>
               </div>
@@ -570,24 +747,24 @@ function handlePrint() {
                   Ticket No.
                 </div>
 
-                <div className="break-words text-[10px] text-[#777] font-bold leading-[1.1]">
+                <div className="break-words text-[10px] font-bold leading-[1.1] text-[#777]">
                   {invoice.ticketNo}
                 </div>
               </div>
 
               <div className="min-w-0 px-[9px] py-[7px]">
-                <div className="mb-[4px] text-[10px] text-[#777]">PNR</div>
+                <div className="mb-[4px] text-[10px] text-[#777]">
+                  PNR
+                </div>
 
-                <div className="break-words text-[10px] font-bold text-[#777] leading-[1.1]">
+                <div className="break-words text-[10px] font-bold leading-[1.1] text-[#777]">
                   {invoice.pnr}
                 </div>
               </div>
             </div>
           </section>
 
-          {/* =================================================
-              PAYMENT HEADING
-          ================================================= */}
+          {/* PAYMENT HEADING */}
 
           <div className="my-[14px] flex w-full items-center gap-[14px]">
             <div className="flex-1 border-t-2 border-dotted border-[#444]" />
@@ -599,9 +776,7 @@ function handlePrint() {
             <div className="flex-1 border-t-2 border-dotted border-[#444]" />
           </div>
 
-          {/* =================================================
-              PAYMENT
-          ================================================= */}
+          {/* PAYMENT */}
 
           <section className="overflow-hidden rounded-[9px] border-2 border-[#222]">
             {/* Fare */}
@@ -625,11 +800,11 @@ function handlePrint() {
             {/* Service Fees */}
 
             <div className="flex min-h-[25px] items-center justify-between gap-4 px-[10px] py-[4px]">
-              <span className="wrap-break-word text-[11px] font-bold leading-[1.2] text-black">
+              <span className="break-words text-[11px] font-bold leading-[1.2] text-black">
                 Service Fees
               </span>
 
-              <span className="wrap-break-word text-[11px] font-bold leading-[1.2] text-black">
+              <span className="break-words text-[11px] font-bold leading-[1.2] text-black">
                 ₹{formatCurrency(invoice.serviceFees)}
               </span>
             </div>
@@ -645,6 +820,7 @@ function handlePrint() {
                 ₹{formatCurrency(cgstAmount)}
               </span>
             </div>
+
             {/* SGST */}
 
             <div className="flex min-h-[25px] items-center justify-between gap-4 border-b-2 border-[#222] px-[10px] py-[4px]">
@@ -659,8 +835,8 @@ function handlePrint() {
 
             {/* Grand Total */}
 
-            <div className="flex min-h-[28px] mb-3 items-center justify-between gap-4 border-b-2 border-[#222] px-[10px] py-[4px]">
-              <span className="break-words text-[11px] font-bold leading-[1.2] text-black ">
+            <div className="mb-3 flex min-h-[28px] items-center justify-between gap-4 border-b-2 border-[#222] px-[10px] py-[4px]">
+              <span className="break-words text-[11px] font-bold leading-[1.2] text-black">
                 Grand Total
               </span>
 
@@ -670,43 +846,42 @@ function handlePrint() {
             </div>
           </section>
 
-          {/* =================================================
-              NOTICE
-          ================================================= */}
+          {/* NOTICE */}
 
-          <div className="break-words text-[11px] mt-3 font-bold leading-[1.2] text-black">
+          <div className="mt-3 break-words text-[11px] font-bold leading-[1.2] text-black">
             {invoice.taxNotice}
           </div>
 
-          <div className="break-words text-[11px] mt-1.5 font-bold leading-[1.2] text-black">
+          <div className="mt-1.5 break-words text-[11px] font-bold leading-[1.2] text-black">
             {invoice.invalidDocument}
           </div>
 
-          {/* =================================================
-              TERMS
-          ================================================= */}
+          {/* TERMS */}
 
           <section className="mt-[13px]">
             <div className="flex items-center gap-3">
-              <div className="flex-1 border-t-3 border-dotted border-[#444]" />
+              <div className="flex-1 border-t-2 border-dotted border-[#444]" />
 
               <span className="break-words text-[11px] font-bold leading-[1.2] text-black">
                 TERMS &amp; CONDITIONS
               </span>
 
-              <div className="flex-1 border-t-3 border-dotted border-[#444]" />
+              <div className="flex-1 border-t-2 border-dotted border-[#444]" />
             </div>
 
             <ol className="mt-[10px] list-decimal pl-2">
               <li className="pl-[3px] text-[10px] leading-[1.45] text-[#222]">
-                Any dispute with respect to the invoice is to be reported back
-                to FlyZone Travels within 48 hours of receipt of invoice.
+                Any dispute with respect to the invoice is to be
+                reported back to FlyZone Travels within 48 hours
+                of receipt of invoice.
               </li>
 
               <li className="pl-[3px] text-[10px] leading-[1.45] text-[#222]">
-                QR code for B2B and SEZ category invoices can only be scanned
-                using app downloaded from the link.
+                QR code for B2B and SEZ category invoices can
+                only be scanned using app downloaded from the
+                link.
                 <br />
+
                 <a
                   href={invoice.qrVerificationUrl}
                   target="_blank"
@@ -718,15 +893,13 @@ function handlePrint() {
               </li>
 
               <li className="pl-[3px] text-[10px] leading-[1.45] text-[#222]">
-                This is system generated invoice and does not require
-                signatures.
+                This is system generated invoice and does not
+                require signatures.
               </li>
             </ol>
           </section>
 
-          {/* =================================================
-              FOOTER
-          ================================================= */}
+          {/* FOOTER */}
 
           <footer className="absolute bottom-[7mm] left-[11mm] right-[11mm] flex items-end justify-between gap-5">
             <div className="max-w-[80%]">
