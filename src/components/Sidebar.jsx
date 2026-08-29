@@ -80,6 +80,12 @@ const navItems = [
     end: false,
   },
   {
+    to: "/hotel-invoice",
+    label: "Agoda Hotel Bill",
+    icon: HotelIcon,
+    end: false,
+  },
+  {
     to: "/foodbill",
     label: "Food Bill",
     icon: CoffeeIcon,
@@ -110,7 +116,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
             style={FRAUNCES}
             className="text-[#F3F1FA] font-semibold text-sm"
           >
-            Bill Gen
+            Bill-Hub
           </span>
         </div>
         <button
@@ -153,7 +159,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
                 style={FRAUNCES}
                 className="text-[#F3F1FA] font-semibold text-[16px] leading-tight tracking-tight truncate"
               >
-                Bill Gen
+                Bill-Hub
               </p>
              
             </div>
