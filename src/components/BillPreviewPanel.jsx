@@ -17,6 +17,7 @@ export default function BillPreviewPanel({
   const [showPoweredBy, setShowPoweredBy] = useState(true);
   const [showGstLines, setShowGstLines] = useState(true);
   const [addressFontSize, setAddressFontSize] = useState(12);
+  const [showDividerLines, setShowDividerLines] = useState(true);
 
   return (
     <div>
@@ -59,7 +60,7 @@ export default function BillPreviewPanel({
         </div>
 
         {/* Address Font Size Control */}
-        <div className="flex items-center justify-between gap-3">
+        <div className="mb-3 flex items-center justify-between gap-3">
           <label className="text-sm font-medium text-slate-700">
             Address Font Size
           </label>
@@ -80,6 +81,21 @@ export default function BillPreviewPanel({
               +
             </button>
           </div>
+        </div>
+
+        {/* Divider Lines Toggle */}
+        <div className="flex items-center justify-between">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={showDividerLines}
+              onChange={(e) => setShowDividerLines(e.target.checked)}
+              className="h-4 w-4 rounded border-slate-300"
+            />
+            <span className="text-sm font-medium text-slate-700">
+              Show Dashed Lines (-----)
+            </span>
+          </label>
         </div>
       </div>
 
@@ -110,6 +126,7 @@ export default function BillPreviewPanel({
           showPoweredBy={showPoweredBy}
           showGstLines={showGstLines}
           addressFontSize={addressFontSize}
+          showDividerLines={showDividerLines}
         />
       </div>
     </div>
