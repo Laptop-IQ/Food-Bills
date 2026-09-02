@@ -1,8 +1,14 @@
 import { Field, Hr } from "./ReceiptControls";
+import { FONT } from "./foodBillConstants";
 
 const hasValue = (value) => String(value ?? "").trim() !== "";
 
-export default function ReceiptHeader({ bill, onChange }) {
+export default function ReceiptHeader({
+  bill,
+  onChange,
+  textStyles = {},
+  onActivate,
+}) {
   const hasName = hasValue(bill.name);
   const hasAddr1 = hasValue(bill.addr1);
   const hasAddr2 = hasValue(bill.addr2);
@@ -18,12 +24,12 @@ export default function ReceiptHeader({ bill, onChange }) {
   const hasBillNo = hasValue(bill.billNo);
   const hasTime = hasValue(bill.time);
 
-  /*
-   * Header data fields are rendered only when they
-   * actually contain data.
-   *
-   * This means an empty field takes ZERO space.
-   */
+  const styleFor = (key, fallback) => ({
+    ...fallback,
+    ...(textStyles[key] || {}),
+    fontFamily: textStyles[key]?.fontFamily || FONT,
+  });
+
   return (
     <>
       <div
@@ -35,39 +41,48 @@ export default function ReceiptHeader({ bill, onChange }) {
       >
         {hasName && (
           <Field
+            fieldKey="name"
             value={bill.name}
             onChange={(v) => onChange("name", v)}
-            style={{
+            onActivate={onActivate}
+            textStyle={textStyles.name}
+            style={styleFor("name", {
               width: "100%",
               textAlign: "center",
               fontSize: "20px",
               fontWeight: "bold",
               letterSpacing: "1.5px",
-            }}
+            })}
           />
         )}
 
         {hasAddr1 && (
           <Field
+            fieldKey="addr1"
             value={bill.addr1}
             onChange={(v) => onChange("addr1", v)}
-            style={{
+            onActivate={onActivate}
+            textStyle={textStyles.addr1}
+            style={styleFor("addr1", {
               width: "100%",
               textAlign: "center",
               fontSize: "12.5px",
-            }}
+            })}
           />
         )}
 
         {hasAddr2 && (
           <Field
+            fieldKey="addr2"
             value={bill.addr2}
             onChange={(v) => onChange("addr2", v)}
-            style={{
+            onActivate={onActivate}
+            textStyle={textStyles.addr2}
+            style={styleFor("addr2", {
               width: "100%",
               textAlign: "center",
               fontSize: "12.5px",
-            }}
+            })}
           />
         )}
 
@@ -80,8 +95,11 @@ export default function ReceiptHeader({ bill, onChange }) {
           >
             GSTIN:{" "}
             <Field
+              fieldKey="gstin"
               value={bill.gstin}
               onChange={(v) => onChange("gstin", v)}
+              onActivate={onActivate}
+              textStyle={textStyles.gstin}
               style={{
                 fontSize: "12.5px",
               }}
@@ -97,8 +115,11 @@ export default function ReceiptHeader({ bill, onChange }) {
           >
             PH:{" "}
             <Field
+              fieldKey="phone"
               value={bill.phone}
               onChange={(v) => onChange("phone", v)}
+              onActivate={onActivate}
+              textStyle={textStyles.phone}
               style={{
                 fontSize: "12.5px",
               }}
@@ -123,8 +144,11 @@ export default function ReceiptHeader({ bill, onChange }) {
             <span>
               Bill No :{" "}
               <Field
+                fieldKey="billNo"
                 value={bill.billNo}
                 onChange={(v) => onChange("billNo", v)}
+                onActivate={onActivate}
+                textStyle={textStyles.billNo}
                 style={{
                   fontSize: "12.5px",
                   width: "82px",
@@ -137,8 +161,11 @@ export default function ReceiptHeader({ bill, onChange }) {
             <span>
               Time :{" "}
               <Field
+                fieldKey="time"
                 value={bill.time}
                 onChange={(v) => onChange("time", v)}
+                onActivate={onActivate}
+                textStyle={textStyles.time}
                 style={{
                   fontSize: "12.5px",
                   width: "52px",
@@ -215,8 +242,11 @@ export default function ReceiptHeader({ bill, onChange }) {
               {hasDate && (
                 <td>
                   <Field
+                    fieldKey="date"
                     value={bill.date}
                     onChange={(v) => onChange("date", v)}
+                    onActivate={onActivate}
+                    textStyle={textStyles.date}
                     style={{
                       width: "64px",
                     }}
@@ -227,8 +257,11 @@ export default function ReceiptHeader({ bill, onChange }) {
               {hasTable && (
                 <td>
                   <Field
+                    fieldKey="table"
                     value={bill.table}
                     onChange={(v) => onChange("table", v)}
+                    onActivate={onActivate}
+                    textStyle={textStyles.table}
                     style={{
                       width: "30px",
                       textAlign: "center",
@@ -240,8 +273,11 @@ export default function ReceiptHeader({ bill, onChange }) {
               {hasPax && (
                 <td>
                   <Field
+                    fieldKey="pax"
                     value={bill.pax}
                     onChange={(v) => onChange("pax", v)}
+                    onActivate={onActivate}
+                    textStyle={textStyles.pax}
                     style={{
                       width: "22px",
                       textAlign: "center",
@@ -253,8 +289,11 @@ export default function ReceiptHeader({ bill, onChange }) {
               {hasUser && (
                 <td>
                   <Field
+                    fieldKey="user"
                     value={bill.user}
                     onChange={(v) => onChange("user", v)}
+                    onActivate={onActivate}
+                    textStyle={textStyles.user}
                     style={{
                       width: "80px",
                     }}
