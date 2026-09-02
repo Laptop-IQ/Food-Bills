@@ -20,6 +20,7 @@ export default function BillReceipt({
   showGstLines = true,
   addressFontSize = 12,
   showDividerLines = true,
+  includeGST = true,
 }) {
   const {
     subtotal = 0,
@@ -36,6 +37,9 @@ export default function BillReceipt({
   const safeCgst = Number(cgst) || 0;
   const safeSgst = Number(sgst) || 0;
   const safeGrandTotal = Number(grandTotal) || 0;
+
+  // Calculate total without GST if needed
+  const totalWithoutGST = safeSubtotal;
 
   return (
     <>
@@ -401,41 +405,75 @@ export default function BillReceipt({
         {/* =========================
             TOTALS
         ========================== */}
-        {safeGrandTotal > 0 && (
+        {(includeGST ? safeGrandTotal > 0 : totalWithoutGST > 0) && (
           <div
             style={{
               fontSize: `${fontSize * 1.17}px`,
             }}
           >
-            {showGstLines && (
-              <div className="flex justify-between">
-                <div className="flex gap-5">
-                  <span className="font-bold">Total :</span>
-                  <span>{totalQty}</span>
+            {includeGST ? (
+              <>
+                {showGstLines && (
+                  <div className="flex justify-between">
+                    <div className="flex gap-5">
+                      <span className="font-bold">Total :</span>
+                      <span>{totalQty}</span>
+                    </div>
+                    <div>Rs {safeSubtotal.toFixed(2)}</div>
+                  </div>
+                )}
+
+                <div className="mt-5 text-right">
+                  <h1
+                    className="font-black"
+                    style={{
+                      fontSize: `${fontSize * 1.67}px`,
+                    }}
+                  >
+                    Grand Total : Rs {safeGrandTotal.toFixed(2)}
+                  </h1>
+
+                  <p className="mt-2">Rounded Amount : {roundedAmount}</p>
+
+                  {hasValue(amountInWords) && (
+                    <p className="mt-2 italic leading-6 capitalize">
+                      {amountInWords}
+                    </p>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex justify-between">
+                  <div className="flex gap-5">
+                    <span className="font-bold">Total :</span>
+                    <span>{totalQty}</span>
+                  </div>
+                  <div>Rs {totalWithoutGST.toFixed(2)}</div>
                 </div>
 
-                <div>Rs {safeSubtotal.toFixed(2)}</div>
-              </div>
+                <div className="mt-5 text-right">
+                  <h1
+                    className="font-black"
+                    style={{
+                      fontSize: `${fontSize * 1.67}px`,
+                    }}
+                  >
+                    Total Amount : Rs {totalWithoutGST.toFixed(2)}
+                  </h1>
+
+                  {hasValue(roundedAmount) && (
+                    <p className="mt-2">Rounded Amount : {roundedAmount}</p>
+                  )}
+
+                  {hasValue(amountInWords) && (
+                    <p className="mt-2 italic leading-6 capitalize">
+                      {amountInWords}
+                    </p>
+                  )}
+                </div>
+              </>
             )}
-
-            <div className="mt-5 text-right">
-              <h1
-                className="font-black"
-                style={{
-                  fontSize: `${fontSize * 1.67}px`,
-                }}
-              >
-                Grand Total : Rs {safeGrandTotal.toFixed(2)}
-              </h1>
-
-              <p className="mt-2">Rounded Amount : {roundedAmount}</p>
-
-              {hasValue(amountInWords) && (
-                <p className="mt-2 italic leading-6 capitalize">
-                  {amountInWords}
-                </p>
-              )}
-            </div>
           </div>
         )}
 
