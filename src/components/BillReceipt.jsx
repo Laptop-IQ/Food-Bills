@@ -390,51 +390,43 @@ export default function BillReceipt({
         {/* =========================
             TOTALS
         ========================== */}
-        <div
-          style={{
-            fontSize: `${fontSize * 1.17}px`,
-          }}
-        >
-          <div className="flex justify-between">
-            <div className="flex gap-5">
-              <span className="font-bold">Total :</span>
-              <span>{totalQty}</span>
-            </div>
+        {safeGrandTotal > 0 && (
+          <div
+            style={{
+              fontSize: `${fontSize * 1.17}px`,
+            }}
+          >
+            {showGstLines && (
+              <div className="flex justify-between">
+                <div className="flex gap-5">
+                  <span className="font-bold">Total :</span>
+                  <span>{totalQty}</span>
+                </div>
 
-            <div>Rs {safeSubtotal.toFixed(2)}</div>
-          </div>
-
-          {showGstLines && (
-            <>
-              <div className="mt-1 text-right">
-                CGST (2.5%) : Rs {safeCgst.toFixed(2)}
+                <div>Rs {safeSubtotal.toFixed(2)}</div>
               </div>
-
-              <div className="mt-1 text-right">
-                SGST (2.5%) : Rs {safeSgst.toFixed(2)}
-              </div>
-            </>
-          )}
-
-          <div className="mt-5 text-right">
-            <h1
-              className="font-black"
-              style={{
-                fontSize: `${fontSize * 1.67}px`,
-              }}
-            >
-              Grand Total : Rs {safeGrandTotal.toFixed(2)}
-            </h1>
-
-            <p className="mt-2">Rounded Amount : {roundedAmount}</p>
-
-            {hasValue(amountInWords) && (
-              <p className="mt-2 italic leading-6 capitalize">
-                {amountInWords}
-              </p>
             )}
+
+            <div className="mt-5 text-right">
+              <h1
+                className="font-black"
+                style={{
+                  fontSize: `${fontSize * 1.67}px`,
+                }}
+              >
+                Grand Total : Rs {safeGrandTotal.toFixed(2)}
+              </h1>
+
+              <p className="mt-2">Rounded Amount : {roundedAmount}</p>
+
+              {hasValue(amountInWords) && (
+                <p className="mt-2 italic leading-6 capitalize">
+                  {amountInWords}
+                </p>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="my-2 border-t border-dashed border-black" />
 
