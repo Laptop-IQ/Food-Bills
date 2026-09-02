@@ -19,6 +19,7 @@ export default function BillReceipt({
   showPoweredBy = true,
   showGstLines = true,
   addressFontSize = 12,
+  showDividerLines = true,
 }) {
   const {
     subtotal = 0,
@@ -293,12 +294,15 @@ export default function BillReceipt({
           )}
         </div>
 
-        <div className="my-2 border-t border-dashed border-black" />
+        {showDividerLines && (
+          <div className="my-2 border-t border-dashed border-black" />
+        )}
 
         {/* =========================
             BILL INFO
         ========================== */}
-        <div className="text-center">
+        {(hasValue(bill.billNo) || hasValue(bill.orderId)) && (
+          <div className="text-center">
           {hasValue(bill.billNo) && (
             <p
               className="font-black"
@@ -321,30 +325,37 @@ export default function BillReceipt({
             </p>
           )}
         </div>
+        )}
 
-        <div className="my-2 border-t border-dashed border-black" />
+        {showDividerLines && (hasValue(bill.billNo) || hasValue(bill.orderId)) && (
+          <div className="my-2 border-t border-dashed border-black" />
+        )}
 
         {/* =========================
             TABLE / USER
         ========================== */}
         {(hasValue(bill.table) || hasValue(bill.user)) && (
-          <div
-            className="flex justify-between gap-2 font-bold"
-            style={{
-              fontSize: `${fontSize * 1.25}px`,
-            }}
-          >
-            <span className="min-w-0 break-words">
-              {hasValue(bill.table) ? `Table: ${bill.table}` : ""}
-            </span>
+          <>
+            <div
+              className="flex justify-between gap-2 font-bold"
+              style={{
+                fontSize: `${fontSize * 1.25}px`,
+              }}
+            >
+              <span className="min-w-0 break-words">
+                {hasValue(bill.table) ? `Table: ${bill.table}` : ""}
+              </span>
 
-            <span className="min-w-0 break-words text-right">
-              {hasValue(bill.user) ? `User: ${bill.user}` : ""}
-            </span>
-          </div>
+              <span className="min-w-0 break-words text-right">
+                {hasValue(bill.user) ? `User: ${bill.user}` : ""}
+              </span>
+            </div>
+
+            {showDividerLines && (
+              <div className="my-2 border-t border-dashed border-black" />
+            )}
+          </>
         )}
-
-        <div className="my-2 border-t border-dashed border-black" />
 
         {/* =========================
             ITEMS
