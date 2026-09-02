@@ -125,3 +125,14 @@ input[type="number"] {
     pointer-events: none;
   }
 }
+
+@media print {
+  @page {
+    size: 84mm 210mm;
+    margin: 0;
+  }
+
+  .receipt-paper {
+    width: 84mm !important;
+  }
+}
