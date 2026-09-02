@@ -43,7 +43,7 @@ export default function BillPreviewPanel({
           </label>
         </div>
 
-        {/* GST Lines Toggle */}
+        {/* Subtotal/Tax Breakdown Toggle */}
         <div className="mb-3 flex items-center justify-between">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
@@ -53,7 +53,7 @@ export default function BillPreviewPanel({
               className="h-4 w-4 rounded border-slate-300"
             />
             <span className="text-sm font-medium text-slate-700">
-              Show GST Lines (CGST/SGST)
+              Show Subtotal & Tax Breakdown
             </span>
           </label>
         </div>
