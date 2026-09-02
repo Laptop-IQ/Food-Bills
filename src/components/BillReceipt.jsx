@@ -15,6 +15,10 @@ export default function BillReceipt({
   onPrintAndSave,
   onSaveOnly,
   storageStatus,
+  // New props for control toggles
+  showPoweredBy = true,
+  showGstLines = true,
+  addressFontSize = 12,
 }) {
   const {
     subtotal = 0,
@@ -249,11 +253,23 @@ export default function BillReceipt({
             <p className="font-bold leading-5">{bill.franchise}</p>
           )}
 
-          {hasValue(bill.address1) && <p>{bill.address1}</p>}
+          {hasValue(bill.address1) && (
+            <p style={{ fontSize: `${addressFontSize}px` }}>
+              {bill.address1}
+            </p>
+          )}
 
-          {hasValue(bill.address2) && <p>{bill.address2}</p>}
+          {hasValue(bill.address2) && (
+            <p style={{ fontSize: `${addressFontSize}px` }}>
+              {bill.address2}
+            </p>
+          )}
 
-          {hasValue(bill.city) && <p>{bill.city}</p>}
+          {hasValue(bill.city) && (
+            <p style={{ fontSize: `${addressFontSize}px` }}>
+              {bill.city}
+            </p>
+          )}
 
           {hasValue(bill.phone) && <p>Contact No: {bill.phone}</p>}
 
@@ -388,13 +404,17 @@ export default function BillReceipt({
             <div>Rs {safeSubtotal.toFixed(2)}</div>
           </div>
 
-          <div className="mt-1 text-right">
-            CGST (2.5%) : Rs {safeCgst.toFixed(2)}
-          </div>
+          {showGstLines && (
+            <>
+              <div className="mt-1 text-right">
+                CGST (2.5%) : Rs {safeCgst.toFixed(2)}
+              </div>
 
-          <div className="mt-1 text-right">
-            SGST (2.5%) : Rs {safeSgst.toFixed(2)}
-          </div>
+              <div className="mt-1 text-right">
+                SGST (2.5%) : Rs {safeSgst.toFixed(2)}
+              </div>
+            </>
+          )}
 
           <div className="mt-5 text-right">
             <h1
@@ -429,7 +449,7 @@ export default function BillReceipt({
         <div className="text-center">
           <p>E&amp;OE. Thank you. Visit Again.</p>
 
-          <p className="mt-3">Powered by TMBill v7.4.80</p>
+          {showPoweredBy && <p className="mt-3">Powered by TMBill v7.4.80</p>}
         </div>
       </div>
     </>
