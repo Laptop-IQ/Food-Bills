@@ -11,11 +11,6 @@ export default function BillReceipt({
   activeFontCss,
   fontSize = 12,
   totals = {},
-  showActions = true,
-  onPrintAndSave,
-  onSaveOnly,
-  storageStatus,
-  // New props for control toggles
   showPoweredBy = true,
   showGstLines = true,
   addressFontSize = 12,
@@ -194,6 +189,24 @@ export default function BillReceipt({
       }
 
       /* ================================
+         FLEX CONTAINERS
+         ================================ */
+      #thermalBill .flex {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      #thermalBill .justify-between {
+        justify-content: space-between !important;
+      }
+
+      #thermalBill .gap-2 {
+        gap: 0.5rem !important;
+      }
+
+      /* ================================
          TEXT
          ================================ */
       #thermalBill p,
@@ -228,7 +241,7 @@ export default function BillReceipt({
           max-w-full
           overflow-hidden
           bg-white
-          p-4
+          p-2
           text-black
           shadow-xl
         "
@@ -243,48 +256,65 @@ export default function BillReceipt({
         <div className="text-center">
           {hasValue(bill.title) && (
             <h1
-              className="font-black leading-tight"
+              className="font-black leading-none"
               style={{
-                fontSize: `${fontSize * 2}px`,
+                fontSize: `${fontSize * 1.8}px`,
               }}
             >
               {bill.title}
             </h1>
           )}
 
-          {hasValue(bill.branch) && <p className="font-bold">{bill.branch}</p>}
+          {hasValue(bill.branch) && (
+            <p className="font-bold text-sm">{bill.branch}</p>
+          )}
 
           {hasValue(bill.franchise) && (
-            <p className="font-bold leading-5">{bill.franchise}</p>
+            <p className="font-bold leading-4 text-xs">{bill.franchise}</p>
           )}
 
           {hasValue(bill.address1) && (
-            <p style={{ fontSize: `${addressFontSize}px` }}>
+            <p
+              style={{ fontSize: `${addressFontSize * 0.85}px` }}
+              className="leading-3"
+            >
               {bill.address1}
             </p>
           )}
 
           {hasValue(bill.address2) && (
-            <p style={{ fontSize: `${addressFontSize}px` }}>
+            <p
+              style={{ fontSize: `${addressFontSize * 0.85}px` }}
+              className="leading-3"
+            >
               {bill.address2}
             </p>
           )}
 
           {hasValue(bill.city) && (
-            <p style={{ fontSize: `${addressFontSize}px` }}>
+            <p
+              style={{ fontSize: `${addressFontSize * 0.85}px` }}
+              className="leading-3"
+            >
               {bill.city}
             </p>
           )}
 
-          {hasValue(bill.phone) && <p>Contact No: {bill.phone}</p>}
-
-          {hasValue(bill.email) && (
-            <p className="break-all">Email: {bill.email}</p>
+          {hasValue(bill.phone) && (
+            <p className="text-xs leading-3">Contact No: {bill.phone}</p>
           )}
 
-          {hasValue(bill.gst) && <p>GST IN {bill.gst}</p>}
+          {hasValue(bill.email) && (
+            <p className="break-all text-xs leading-3">Email: {bill.email}</p>
+          )}
 
-          {hasValue(bill.date) && <p>{bill.date}</p>}
+          {hasValue(bill.gst) && (
+            <p className="text-xs leading-3">GST IN {bill.gst}</p>
+          )}
+
+          {hasValue(bill.date) && (
+            <p className="text-xs leading-3">{bill.date}</p>
+          )}
 
           {hasValue(bill.dine) && (
             <p
@@ -299,7 +329,7 @@ export default function BillReceipt({
         </div>
 
         {showDividerLines && (
-          <div className="my-2 border-t border-dashed border-black" />
+          <div className="my-1 border-t border-dashed border-black" />
         )}
 
         {/* =========================
@@ -307,33 +337,34 @@ export default function BillReceipt({
         ========================== */}
         {(hasValue(bill.billNo) || hasValue(bill.orderId)) && (
           <div className="text-center">
-          {hasValue(bill.billNo) && (
-            <p
-              className="font-black"
-              style={{
-                fontSize: `${fontSize * 1.5}px`,
-              }}
-            >
-              Bill No : {bill.billNo}
-            </p>
-          )}
+            {hasValue(bill.billNo) && (
+              <p
+                className="font-black"
+                style={{
+                  fontSize: `${fontSize * 1.5}px`,
+                }}
+              >
+                Bill No : {bill.billNo}
+              </p>
+            )}
 
-          {hasValue(bill.orderId) && (
-            <p
-              className="font-bold"
-              style={{
-                fontSize: `${fontSize * 1.33}px`,
-              }}
-            >
-              Order Id: {bill.orderId}
-            </p>
-          )}
-        </div>
+            {hasValue(bill.orderId) && (
+              <p
+                className="font-bold"
+                style={{
+                  fontSize: `${fontSize * 1.33}px`,
+                }}
+              >
+                Order Id: {bill.orderId}
+              </p>
+            )}
+          </div>
         )}
 
-        {showDividerLines && (hasValue(bill.billNo) || hasValue(bill.orderId)) && (
-          <div className="my-2 border-t border-dashed border-black" />
-        )}
+        {showDividerLines &&
+          (hasValue(bill.billNo) || hasValue(bill.orderId)) && (
+            <div className="my-1 border-t border-dashed border-black" />
+          )}
 
         {/* =========================
             TABLE / USER
@@ -356,7 +387,7 @@ export default function BillReceipt({
             </div>
 
             {showDividerLines && (
-              <div className="my-2 border-t border-dashed border-black" />
+              <div className="my-1 border-t border-dashed border-black" />
             )}
           </>
         )}
@@ -366,9 +397,9 @@ export default function BillReceipt({
         ========================== */}
         <div>
           <div
-            className="mb-2 flex font-black"
+            className="mb-1 flex font-bold text-xs leading-4"
             style={{
-              fontSize: `${fontSize * 1.15}px`,
+              fontSize: `${fontSize * 1.05}px`,
             }}
           >
             <div className="w-[50%]">Item</div>
@@ -383,8 +414,8 @@ export default function BillReceipt({
             const amount = qty * rate;
 
             return (
-              <div key={item?.id ?? `item-${index}`} className="mb-1">
-                <div className="flex">
+              <div key={item?.id ?? `item-${index}`} className="leading-4">
+                <div className="flex text-xs">
                   <div className="w-[50%] break-words pr-1">
                     {index + 1}. {item?.name || "Item"}
                   </div>
@@ -400,7 +431,7 @@ export default function BillReceipt({
           })}
         </div>
 
-        <div className="my-2 border-t border-dashed border-black" />
+        <div className="my-1 border-t border-dashed border-black" />
 
         {/* =========================
             TOTALS
@@ -408,35 +439,149 @@ export default function BillReceipt({
         {(includeGST ? safeGrandTotal > 0 : totalWithoutGST > 0) && (
           <div
             style={{
-              fontSize: `${fontSize * 1.17}px`,
+              fontSize: `${fontSize}px`,
+              width: "100%",
             }}
           >
             {includeGST ? (
               <>
                 {showGstLines && (
-                  <div className="flex justify-between">
-                    <div className="flex gap-5">
-                      <span className="font-bold">Total :</span>
-                      <span>{totalQty}</span>
+                  <>
+                    {/* Total Row */}
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr 1fr",
+                        alignItems: "center",
+                        width: "100%",
+                        lineHeight: "1.5",
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          textAlign: "left",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        Total :
+                      </span>
+
+                      <span
+                        style={{
+                          textAlign: "center",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {totalQty}
+                      </span>
+
+                      <span
+                        style={{
+                          textAlign: "right",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        Rs {safeSubtotal.toFixed(2)}
+                      </span>
                     </div>
-                    <div>Rs {safeSubtotal.toFixed(2)}</div>
-                  </div>
+
+                    {/* CGST */}
+                    {safeCgst > 0 && (
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr 1fr",
+                          alignItems: "center",
+                          width: "100%",
+                          lineHeight: "1.5",
+                        }}
+                      >
+                        <span></span>
+
+                        <span></span>
+
+                        <span
+                          style={{
+                            textAlign: "right",
+                            whiteSpace: "nowrap",
+                            fontWeight: 600,
+                          }}
+                        >
+                          CGST (2.5%) : Rs {safeCgst.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* SGST */}
+                    {safeSgst > 0 && (
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr 1fr 1fr",
+                          alignItems: "center",
+                          width: "100%",
+                          lineHeight: "1.5",
+                        }}
+                      >
+                        <span></span>
+
+                        <span></span>
+
+                        <span
+                          style={{
+                            textAlign: "right",
+                            whiteSpace: "nowrap",
+                            fontWeight: 600,
+                          }}
+                        >
+                          SGST (2.5%) : Rs {safeSgst.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+                  </>
                 )}
 
-                <div className="mt-5 text-right">
+                {/* Grand Total */}
+                <div
+                  style={{
+                    marginTop: "10px",
+                    textAlign: "right",
+                    width: "100%",
+                  }}
+                >
                   <h1
-                    className="font-black"
                     style={{
+                      margin: 0,
+                      fontWeight: 900,
+                      lineHeight: "1.25",
                       fontSize: `${fontSize * 1.67}px`,
+                      whiteSpace: "nowrap",
                     }}
                   >
                     Grand Total : Rs {safeGrandTotal.toFixed(2)}
                   </h1>
 
-                  <p className="mt-2">Rounded Amount : {roundedAmount}</p>
+                  <p
+                    style={{
+                      margin: "4px 0 0",
+                      fontSize: `${fontSize}px`,
+                      lineHeight: "1.4",
+                    }}
+                  >
+                    Rounded Amount : {roundedAmount}
+                  </p>
 
                   {hasValue(amountInWords) && (
-                    <p className="mt-2 italic leading-6 capitalize">
+                    <p
+                      style={{
+                        margin: "4px 0 0",
+                        fontStyle: "italic",
+                        lineHeight: "1.4",
+                        fontSize: `${fontSize - 1}px`,
+                        textTransform: "capitalize",
+                      }}
+                    >
                       {amountInWords}
                     </p>
                   )}
@@ -444,30 +589,86 @@ export default function BillReceipt({
               </>
             ) : (
               <>
-                <div className="flex justify-between">
-                  <div className="flex gap-5">
-                    <span className="font-bold">Total :</span>
-                    <span>{totalQty}</span>
-                  </div>
-                  <div>Rs {totalWithoutGST.toFixed(2)}</div>
+                {/* Total Row Without GST */}
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr 1fr",
+                    alignItems: "center",
+                    width: "100%",
+                    lineHeight: "1.5",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      textAlign: "left",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Total :
+                  </span>
+
+                  <span
+                    style={{
+                      textAlign: "center",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {totalQty}
+                  </span>
+
+                  <span
+                    style={{
+                      textAlign: "right",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Rs {totalWithoutGST.toFixed(2)}
+                  </span>
                 </div>
 
-                <div className="mt-5 text-right">
+                {/* Total Amount */}
+                <div
+                  style={{
+                    marginTop: "10px",
+                    textAlign: "right",
+                    width: "100%",
+                  }}
+                >
                   <h1
-                    className="font-black"
                     style={{
+                      margin: 0,
+                      fontWeight: 900,
+                      lineHeight: "1.25",
                       fontSize: `${fontSize * 1.67}px`,
+                      whiteSpace: "nowrap",
                     }}
                   >
                     Total Amount : Rs {totalWithoutGST.toFixed(2)}
                   </h1>
 
                   {hasValue(roundedAmount) && (
-                    <p className="mt-2">Rounded Amount : {roundedAmount}</p>
+                    <p
+                      style={{
+                        margin: "4px 0 0",
+                        fontSize: `${fontSize}px`,
+                      }}
+                    >
+                      Rounded Amount : {roundedAmount}
+                    </p>
                   )}
 
                   {hasValue(amountInWords) && (
-                    <p className="mt-2 italic leading-6 capitalize">
+                    <p
+                      style={{
+                        margin: "4px 0 0",
+                        fontStyle: "italic",
+                        lineHeight: "1.4",
+                        fontSize: `${fontSize - 1}px`,
+                        textTransform: "capitalize",
+                      }}
+                    >
                       {amountInWords}
                     </p>
                   )}
@@ -476,8 +677,7 @@ export default function BillReceipt({
             )}
           </div>
         )}
-
-        <div className="my-2 border-t border-dashed border-black" />
+        <div className="my-1 border-t border-dashed border-black" />
 
         {/* =========================
             PAID
@@ -487,10 +687,12 @@ export default function BillReceipt({
         {/* =========================
             FOOTER
         ========================== */}
-        <div className="text-center">
-          <p>E&amp;OE. Thank you. Visit Again.</p>
+        <div className="text-center text-xs">
+          <p className="leading-4">E&amp;OE. Thank you. Visit Again.</p>
 
-          {showPoweredBy && <p className="mt-3">Powered by TMBill v7.4.80</p>}
+          {showPoweredBy && (
+            <p className="mt-1 text-xs">Powered by TMBill v7.4.80</p>
+          )}
         </div>
       </div>
     </>
