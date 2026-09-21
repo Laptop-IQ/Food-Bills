@@ -1,27 +1,17 @@
-import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 
 export default function Layout() {
-  const [collapsed, setCollapsed] = useState(false);
-
   return (
-    <div className="min-h-screen bg-[#0A0810]">
-      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#0A0810]">
+      {/* Only Mobile Menu + Logo */}
+      <Sidebar />
 
-      <main
-        className={`
-          min-h-screen
-          pt-14
-          md:pt-0
-          transition-[padding]
-          duration-300
-          ease-in-out
-
-          ${collapsed ? "md:pl-[84px]" : "md:pl-[264px]"}
-        `}
-      >
-        <Outlet />
+      {/* Main Content */}
+      <main className="min-h-screen w-full pt-14 md:pt-0">
+        <div className="relative min-h-screen w-full">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

@@ -6,6 +6,8 @@ import FoodBill from "./components/Foods/FoodBill";
 import TaxInvoice from "./pages/TaxInvoice";
 import HotelsInvoice from "./pages/Hotels";
 import AgodaReceiptOriginal from "./pages/AgodaReceiptOriginal";
+import PhonePe from "./pages/PhonePe";
+import Gpay from "./pages/Gpay";
 
 function PortfolioPage() {
   return (
@@ -26,6 +28,8 @@ function App() {
           <Route path="/tax-invoice" element={<TaxInvoice />} />
           <Route path="/hotels-invoice" element={<HotelsInvoice />} />
           <Route path="/hotel-invoice" element={<AgodaReceiptOriginal />} />
+          <Route path="/PhonePe" element={<PhonePe />} />
+          <Route path="/Gpay" element={<Gpay />} />
         </Route>
       </Routes>
     </BrowserRouter>
