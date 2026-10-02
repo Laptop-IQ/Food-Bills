@@ -1,6 +1,7 @@
 import React from "react";
 import { VIEW } from "../layout/constants";
 import BillPreviewPanel from "./BillPreviewPanel";
+import TextStyleControls from "./TextStyleControls";
 
 const EDITOR_FIELDS = [
   ["title", "Restaurant Name", false],
@@ -34,6 +35,12 @@ export default function BillEditorView({
   setView,
   storageStatus,
   fontControlProps,
+  textStyles,
+  selectedTextField,
+  setSelectedTextField,
+  onTextStyleChange,
+  onTextStyleReset,
+  onTextStylesResetAll,
   totals,
   onTogglePaid,
 }) {
@@ -250,6 +257,36 @@ export default function BillEditorView({
               ))}
             </div>
 
+            {/* Text styling */}
+            <div
+              className={`
+                mt-6
+                rounded-2xl
+                border
+                ${cardBorder}
+                p-4
+                ${darkMode ? "bg-white/[0.02]" : "bg-slate-50/70"}
+              `}
+            >
+              <div className="mb-4">
+                <h2 className="text-base font-bold">Text Formatting</h2>
+                <p className={`mt-1 text-xs ${mutedText}`}>
+                  GST Number, font size, bold and text spacing can be changed here.
+                  Changes apply instantly to preview and print/PDF.
+                </p>
+              </div>
+
+              <TextStyleControls
+                textStyles={textStyles}
+                selectedField={selectedTextField}
+                onFieldChange={setSelectedTextField}
+                onStyleChange={onTextStyleChange}
+                onResetField={onTextStyleReset}
+                onResetAll={onTextStylesResetAll}
+                baseFontSize={fontControlProps?.fontSize || 12}
+              />
+            </div>
+
             {/* Items */}
             <div className="mt-8">
               <div className="mb-4 flex items-center justify-between">
@@ -464,6 +501,7 @@ export default function BillEditorView({
             <BillPreviewPanel
               mutedText={mutedText}
               fontControlProps={fontControlProps}
+              textStyles={textStyles}
               bill={bill}
               items={items}
               totals={totals}

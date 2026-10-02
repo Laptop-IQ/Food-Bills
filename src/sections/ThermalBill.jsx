@@ -11,6 +11,7 @@ import {
 } from "../layout/constants";
 
 import { FONT_FAMILIES, GOOGLE_FONTS_URL } from "../layout/fonts";
+import { cloneDefaultTextStyles, normalizeTextStyles } from "../layout/textStyles";
 
 import {
   getCurrentDateTime,
@@ -56,6 +57,10 @@ export default function ThermalBill() {
   const [fontFamily, setFontFamily] = useState("mono");
   const [fontSize, setFontSize] = useState(FONT_SIZE_DEFAULT);
   const [darkMode, setDarkMode] = useState(false);
+
+  // Per-field receipt typography/spacing. These settings are saved with each bill.
+  const [textStyles, setTextStyles] = useState(() => cloneDefaultTextStyles());
+  const [selectedTextField, setSelectedTextField] = useState("gst");
 
   // Feedback UI
   const [toast, setToast] = useState(null);
@@ -353,6 +358,8 @@ export default function ThermalBill() {
     });
 
     setItems(defaultItems);
+    setTextStyles(cloneDefaultTextStyles());
+    setSelectedTextField("gst");
     setEditingId(null);
     setStorageStatus("");
     setView(VIEW.EDITOR);
@@ -379,6 +386,8 @@ export default function ThermalBill() {
       });
 
       setItems(saved.items || []);
+      setTextStyles(normalizeTextStyles(saved.textStyles));
+      setSelectedTextField("gst");
       setStorageStatus("");
       setView(VIEW.EDITOR);
 
@@ -400,6 +409,7 @@ export default function ThermalBill() {
               bill,
               items,
               grandTotal,
+              textStyles,
             }
           : b,
       );
@@ -409,6 +419,7 @@ export default function ThermalBill() {
         bill,
         items,
         grandTotal,
+        textStyles,
       };
 
       updatedBills = [...savedBills, newEntry];
@@ -437,6 +448,7 @@ export default function ThermalBill() {
     bill,
     items,
     grandTotal,
+    textStyles,
     persistBills,
     lastSerial,
     showToast,
@@ -538,6 +550,31 @@ export default function ThermalBill() {
   ]);
 
   /* ─────────────────────────────────────────────
+     Per-field text style controls
+  ───────────────────────────────────────────── */
+
+  const updateTextStyle = useCallback((field, key, value) => {
+    setTextStyles((previous) => ({
+      ...previous,
+      [field]: {
+        ...previous[field],
+        [key]: value,
+      },
+    }));
+  }, []);
+
+  const resetTextStyle = useCallback((field) => {
+    setTextStyles((previous) => ({
+      ...previous,
+      [field]: { ...cloneDefaultTextStyles()[field] },
+    }));
+  }, []);
+
+  const resetAllTextStyles = useCallback(() => {
+    setTextStyles(cloneDefaultTextStyles());
+  }, []);
+
+  /* ─────────────────────────────────────────────
      Font controls
   ───────────────────────────────────────────── */
 
@@ -610,6 +647,12 @@ export default function ThermalBill() {
           setView={setView}
           storageStatus={storageStatus}
           fontControlProps={fontControlProps}
+          textStyles={textStyles}
+          selectedTextField={selectedTextField}
+          setSelectedTextField={setSelectedTextField}
+          onTextStyleChange={updateTextStyle}
+          onTextStyleReset={resetTextStyle}
+          onTextStylesResetAll={resetAllTextStyles}
           totals={totals}
           onTogglePaid={togglePaid}
         />
@@ -644,6 +687,12 @@ export default function ThermalBill() {
           theme={theme}
           setView={setView}
           fontControlProps={fontControlProps}
+          textStyles={textStyles}
+          selectedTextField={selectedTextField}
+          setSelectedTextField={setSelectedTextField}
+          onTextStyleChange={updateTextStyle}
+          onTextStyleReset={resetTextStyle}
+          onTextStylesResetAll={resetAllTextStyles}
           bill={bill}
           items={items}
           totals={totals}

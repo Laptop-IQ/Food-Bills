@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { VIEW } from "../layout/constants";
 import FontControls from "./FontControls";
+import TextStyleControls from "./TextStyleControls";
 import BillReceipt from "./BillReceipt";
 
 const hasValue = (value) =>
@@ -10,6 +11,12 @@ export default function BillPreviewView({
   theme,
   setView,
   fontControlProps,
+  textStyles = {},
+  selectedTextField = "gst",
+  setSelectedTextField,
+  onTextStyleChange,
+  onTextStyleReset,
+  onTextStylesResetAll,
   bill = {},
   items = [],
   totals = {},
@@ -545,6 +552,30 @@ export default function BillPreviewView({
                     </div>
 
                     {/* =========================================
+                        PER-FIELD TEXT STYLE SETTINGS
+                    ========================================== */}
+                    <div className="border-b border-slate-100 p-4 sm:p-5">
+                      <SectionTitle
+                        icon="T"
+                        iconClass="bg-emerald-50 text-emerald-600"
+                        title="Text & Spacing"
+                        description="Control size, bold, top/bottom gaps and alignment"
+                      />
+
+                      <div className="mt-3 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm">
+                        <TextStyleControls
+                          textStyles={textStyles}
+                          selectedField={selectedTextField}
+                          onFieldChange={setSelectedTextField}
+                          onStyleChange={onTextStyleChange}
+                          onResetField={onTextStyleReset}
+                          onResetAll={onTextStylesResetAll}
+                          baseFontSize={fontControlProps?.fontSize || 12}
+                        />
+                      </div>
+                    </div>
+
+                    {/* =========================================
                         RECEIPT OPTIONS
                     ========================================== */}
                     <div className="p-4 sm:p-5">
@@ -822,6 +853,7 @@ export default function BillPreviewView({
                   items={items}
                   activeFontCss={fontControlProps.activeFontCss}
                   fontSize={fontControlProps.fontSize}
+                  textStyles={textStyles}
                   totals={totals}
                   showActions={false}
                   onPrintAndSave={onPrintAndSave}

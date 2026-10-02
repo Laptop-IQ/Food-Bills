@@ -4,6 +4,7 @@ import BillReceipt from "./BillReceipt";
 export default function BillPreviewPanel({
   mutedText,
   fontControlProps,
+  textStyles = {},
   bill,
   items,
   totals,
@@ -40,6 +41,7 @@ export default function BillPreviewPanel({
           items={items}
           activeFontCss={fontControlProps?.activeFontCss}
           fontSize={fontControlProps?.fontSize}
+          textStyles={textStyles}
           totals={totals}
           showActions={showActions}
           onPrintAndSave={onPrintAndSave}
