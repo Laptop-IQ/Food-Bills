@@ -588,7 +588,7 @@ export default function BillPreviewView({
                         icon="Aa"
                         iconClass="bg-indigo-50 text-indigo-600"
                         title="Font Change"
-                        description="Change the receipt font family"
+                        
                       />
 
                       <div className="mt-3">
@@ -706,44 +706,7 @@ export default function BillPreviewView({
 
                       </div>
 
-                      <div
-                        className="
-                          mt-3
-                          flex
-                          items-center
-                          gap-2
-                          rounded-2xl
-                          border
-                          border-indigo-100
-                          bg-gradient-to-r
-                          from-indigo-50
-                          to-violet-50/70
-                          px-3
-                          py-2.5
-                        "
-                      >
-                        <span
-                          className="
-                            flex
-                            h-5
-                            w-5
-                            shrink-0
-                            items-center
-                            justify-center
-                            rounded-full
-                            bg-indigo-100
-                            text-[10px]
-                            font-black
-                            text-indigo-600
-                          "
-                        >
-                          i
-                        </span>
-
-                        <span className="text-[10px] font-semibold text-indigo-600">
-                          Changes update the live preview instantly.
-                        </span>
-                      </div>
+                     
                     </div>
                   </div>
                 </div>

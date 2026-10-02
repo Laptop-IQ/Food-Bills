@@ -113,14 +113,9 @@ export default function BillEditorView({
                 {editingId ? "EDIT" : "NEW"}
               </span>
 
-              <h1 className="truncate text-sm font-bold sm:text-base">
-                {editingId ? "Edit Bill" : "Create New Bill"}
-              </h1>
             </div>
 
-            <p className={`mt-0.5 text-[10px] ${mutedText}`}>
-              {bill.billNo || "New bill"}
-            </p>
+           
           </div>
 
           <div
@@ -290,10 +285,6 @@ export default function BillEditorView({
             >
               <div className="mb-4">
                 <h2 className="text-base font-bold">Text Formatting</h2>
-                <p className={`mt-1 text-xs ${mutedText}`}>
-                  GST Number, font size, bold and text spacing can be changed here.
-                  Changes apply instantly to preview and print/PDF.
-                </p>
               </div>
 
               <TextStyleControls
