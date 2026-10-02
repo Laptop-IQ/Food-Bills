@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { VIEW } from "../layout/constants";
 
 /* ---------------- Icons (inline, no extra deps) ---------------- */
@@ -167,9 +168,12 @@ export default function SavedBillsListView({
   startEditBill,
   setView,
   deleteSavedBill,
+  onOpenTemplates,
+  onOpenDashboard,
 }) {
   const { pageBg, cardBg, cardBorder, mutedText } = theme;
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   const totalBills = savedBills.length;
   const totalRevenue = savedBills.reduce(
@@ -272,6 +276,18 @@ export default function SavedBillsListView({
                   }`}
                 />
               </div>
+              <button
+                onClick={onOpenTemplates}
+                className={`inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-sm font-semibold transition-colors shrink-0 ${darkMode ? "border-neutral-700 text-neutral-200 hover:bg-neutral-800" : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"}`}
+              >
+                📑 Templates
+              </button>
+              <button
+                onClick={() => (onOpenDashboard ? onOpenDashboard() : navigate("/bill-dashboard"))}
+                className={`inline-flex items-center gap-1.5 rounded-lg border px-3.5 py-2 text-sm font-semibold transition-colors shrink-0 ${darkMode ? "border-neutral-700 text-neutral-200 hover:bg-neutral-800" : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"}`}
+              >
+                📊 Dashboard
+              </button>
               <button
                 onClick={startNewBill}
                 className="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 sm:px-4 py-2 rounded-lg font-semibold text-sm transition-colors shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"

@@ -34,6 +34,8 @@ import BillEditorView from "../components/BillEditorView";
 import BillPreviewView from "../components/BillPreviewView";
 
 import { Toast, ConfirmModal } from "../components/FeedbackUI";
+import BillTemplateManager from "../components/BillTemplateManager";
+import BillDashboard from "../pages/BillDashboard";
 
 export default function ThermalBill() {
   const [view, setView] = useState(VIEW.LIST);
@@ -65,6 +67,9 @@ export default function ThermalBill() {
   // Feedback UI
   const [toast, setToast] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [templateManagerOpen, setTemplateManagerOpen] = useState(false);
+  const [templateEditingId, setTemplateEditingId] = useState(null);
+  const [templateName, setTemplateName] = useState("");
 
   /* ─────────────────────────────────────────────
      Feedback
@@ -361,6 +366,8 @@ export default function ThermalBill() {
     setTextStyles(cloneDefaultTextStyles());
     setSelectedTextField("gst");
     setEditingId(null);
+    setTemplateEditingId(null);
+    setTemplateName("");
     setStorageStatus("");
     setView(VIEW.EDITOR);
 
@@ -379,6 +386,8 @@ export default function ThermalBill() {
   const startEditBill = useCallback(
     (saved) => {
       setEditingId(saved.id);
+      setTemplateEditingId(saved.templateId || null);
+    setTemplateName(saved.templateName || "");
 
       setBill({
         paid: false,
@@ -410,16 +419,25 @@ export default function ThermalBill() {
               items,
               grandTotal,
               textStyles,
+              templateId: templateEditingId || b.templateId || null,
+              templateName: templateName || b.templateName || null,
+              updatedAt: new Date().toISOString(),
+              createdAt: b.createdAt || new Date().toISOString(),
             }
           : b,
       );
     } else {
+      const now = new Date().toISOString();
       const newEntry = {
         id: Date.now(),
         bill,
         items,
         grandTotal,
         textStyles,
+        templateId: templateEditingId || null,
+        templateName: templateName || null,
+        createdAt: now,
+        updatedAt: now,
       };
 
       updatedBills = [...savedBills, newEntry];
@@ -449,6 +467,8 @@ export default function ThermalBill() {
     items,
     grandTotal,
     textStyles,
+    templateEditingId,
+    templateName,
     persistBills,
     lastSerial,
     showToast,
@@ -575,6 +595,59 @@ export default function ThermalBill() {
   }, []);
 
   /* ─────────────────────────────────────────────
+     Bill templates
+  ───────────────────────────────────────────── */
+
+  const openTemplateManager = useCallback(() => {
+    setTemplateManagerOpen(true);
+  }, []);
+
+  const handleTemplateSaved = useCallback((savedTemplate) => {
+    setTemplateEditingId(savedTemplate?.id || null);
+    setTemplateName(savedTemplate?.name || "");
+    showToast({
+      type: "success",
+      title: "Template saved",
+      message: `${savedTemplate?.name || "Template"} is ready to reuse.`,
+      duration: 2400,
+    });
+  }, [showToast]);
+
+  const handleLoadTemplate = useCallback((template) => {
+    const { billNo, serial } = getNextBillNo(lastSerial);
+
+    setLastSerial(serial);
+    setTemplateEditingId(template.id);
+    setTemplateName(template.name || "");
+    setEditingId(null);
+    setBill({
+      ...restaurantDefaults,
+      ...(template.bill || {}),
+      date: getCurrentDateTime(),
+      billNo,
+      orderId: generateOrderId(),
+      paid: false,
+    });
+    setItems(template.items?.length ? template.items.map((item, index) => ({ ...item, id: item.id || `${Date.now()}-${index}` })) : defaultItems);
+    setTextStyles(normalizeTextStyles(template.textStyles));
+    setFontFamily(template.fontFamily || "mono");
+    setFontSize(Number(template.fontSize) || FONT_SIZE_DEFAULT);
+    saveFontFamily(template.fontFamily || "mono");
+    saveFontSize(Number(template.fontSize) || FONT_SIZE_DEFAULT);
+    setSelectedTextField("gst");
+    setStorageStatus("");
+    setTemplateManagerOpen(false);
+    setView(VIEW.EDITOR);
+
+    showToast({
+      type: "success",
+      title: "Template loaded",
+      message: `${template.name} loaded into a new bill.`,
+      duration: 2200,
+    });
+  }, [lastSerial, showToast]);
+
+  /* ─────────────────────────────────────────────
      Font controls
   ───────────────────────────────────────────── */
 
@@ -605,6 +678,22 @@ export default function ThermalBill() {
           startEditBill={startEditBill}
           setView={setView}
           deleteSavedBill={requestDeleteBill}
+          onOpenTemplates={openTemplateManager}
+        />
+
+        <BillTemplateManager
+          open={templateManagerOpen}
+          darkMode={darkMode}
+          currentBill={bill}
+          currentItems={items}
+          currentTextStyles={textStyles}
+          currentFontFamily={fontFamily}
+          currentFontSize={fontSize}
+          editingTemplateId={templateEditingId}
+          initialName={templateName}
+          onClose={() => setTemplateManagerOpen(false)}
+          onLoad={handleLoadTemplate}
+          onSaved={handleTemplateSaved}
         />
 
         <Toast toast={toast} onClose={closeToast} />
@@ -627,6 +716,25 @@ export default function ThermalBill() {
   }
 
   /* ─────────────────────────────────────────────
+     DASHBOARD
+  ───────────────────────────────────────────── */
+
+  if (view === VIEW.DASHBOARD) {
+    return (
+      <>
+        <BillDashboard />
+        <button
+          type="button"
+          onClick={() => setView(VIEW.LIST)}
+          className="no-print fixed bottom-5 right-5 z-50 rounded-full bg-slate-900 px-4 py-3 text-sm font-bold text-white shadow-xl hover:bg-slate-700"
+        >
+          ← Bills
+        </button>
+      </>
+    );
+  }
+
+  /* ─────────────────────────────────────────────
      EDITOR
   ───────────────────────────────────────────── */
 
@@ -644,6 +752,7 @@ export default function ThermalBill() {
           addItem={addItem}
           deleteItem={deleteItem}
           onSave={saveBill}
+          onSaveTemplate={openTemplateManager}
           setView={setView}
           storageStatus={storageStatus}
           fontControlProps={fontControlProps}
@@ -655,6 +764,21 @@ export default function ThermalBill() {
           onTextStylesResetAll={resetAllTextStyles}
           totals={totals}
           onTogglePaid={togglePaid}
+        />
+
+        <BillTemplateManager
+          open={templateManagerOpen}
+          darkMode={darkMode}
+          currentBill={bill}
+          currentItems={items}
+          currentTextStyles={textStyles}
+          currentFontFamily={fontFamily}
+          currentFontSize={fontSize}
+          editingTemplateId={templateEditingId}
+          initialName={templateName}
+          onClose={() => setTemplateManagerOpen(false)}
+          onLoad={handleLoadTemplate}
+          onSaved={handleTemplateSaved}
         />
 
         <Toast toast={toast} onClose={closeToast} />

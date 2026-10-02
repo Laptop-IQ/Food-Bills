@@ -32,6 +32,7 @@ export default function BillEditorView({
   addItem,
   deleteItem,
   onSave,
+  onSaveTemplate,
   setView,
   storageStatus,
   fontControlProps,
@@ -154,6 +155,26 @@ export default function BillEditorView({
             "
           >
             💾 <span className="hidden sm:inline">Save</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={onSaveTemplate}
+            className="
+              rounded-xl
+              border border-violet-200
+              bg-violet-50
+              px-3.5 py-2
+              text-sm font-bold
+              text-violet-700
+              shadow-sm
+              transition-all
+              hover:bg-violet-100
+              active:scale-95
+              sm:px-4
+            "
+          >
+            📑 <span className="hidden sm:inline">Save Template</span>
           </button>
 
           <button

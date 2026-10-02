@@ -44,6 +44,9 @@ export function saveBills(bills, serial) {
   try {
     localStorage.setItem(STORAGE_KEYS.BILLS, JSON.stringify(bills));
     localStorage.setItem(STORAGE_KEYS.SERIAL, String(serial));
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("thermal-bills-updated"));
+    }
     return { ok: true };
   } catch (err) {
     return { ok: false, error: err.message };

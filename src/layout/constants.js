@@ -23,4 +23,4 @@ export const FONT_SIZE_DEFAULT = 12;
 export const FONT_SIZE_MIN = 9;
 export const FONT_SIZE_MAX = 18;
 
-export const VIEW = { LIST: "list", EDITOR: "editor", PREVIEW: "preview" };
+export const VIEW = { LIST: "list", EDITOR: "editor", PREVIEW: "preview", DASHBOARD: "dashboard" };

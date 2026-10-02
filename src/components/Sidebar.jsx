@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   CreditCard,
   Smartphone,
+  BarChart3,
 } from "lucide-react";
 
 /* -------------------------------------------------------
@@ -58,6 +59,11 @@ const navItems = [
     to: "/phonepe",
     label: "PhonePe UPI",
     icon: CreditCard,
+  },
+  {
+    to: "/bill-dashboard",
+    label: "Bills Dashboard",
+    icon: BarChart3,
   },
 ];
 
@@ -170,7 +176,7 @@ function Sidebar() {
           border-b border-white/[0.06]
           bg-[#11101A]/95 px-4
           backdrop-blur-xl
-          md:flex
+          flex md:hidden
         "
       >
         {/* Logo */}
