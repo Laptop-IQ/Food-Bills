@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { VIEW } from "../layout/constants";
-import FontControls from "./FontControls";
 import TextStyleControls from "./TextStyleControls";
+import { FONT_FAMILIES } from "../layout/fonts";
 import BillReceipt from "./BillReceipt";
 
 const hasValue = (value) =>
@@ -30,10 +30,54 @@ export default function BillPreviewView({
   const [isSettingsOpen, setIsSettingsOpen] = useState(true);
 
   // Receipt settings
-  const [showPoweredBy, setShowPoweredBy] = useState(true);
+  const [showPoweredBy, setShowPoweredBy] = useState(() => {
+    try {
+      const saved = localStorage.getItem("foodBills.showPoweredBy");
+      return saved === null ? true : saved === "true";
+    } catch {
+      return true;
+    }
+  });
   const [showGstLines, setShowGstLines] = useState(true);
-  const [addressFontSize, setAddressFontSize] = useState(12);
-  const [showDividerLines, setShowDividerLines] = useState(true);
+  const [showDividerLines, setShowDividerLines] = useState(() => {
+    try {
+      const saved = localStorage.getItem("foodBills.showDividerLines");
+      return saved === null ? true : saved === "true";
+    } catch {
+      return true;
+    }
+  });
+  const [footerMessage, setFooterMessage] = useState(() => {
+    try {
+      return localStorage.getItem("foodBills.footerMessage") || "Thank you. Visit Again.";
+    } catch {
+      return "Thank you. Visit Again.";
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("foodBills.showPoweredBy", String(showPoweredBy));
+    } catch {}
+  }, [showPoweredBy]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("foodBills.footerMessage", footerMessage);
+    } catch {}
+  }, [footerMessage]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("foodBills.showDividerLines", String(showDividerLines));
+    } catch {}
+  }, [showDividerLines]);
+  const [receiptPlacement] = useState(() => ({
+    // Keep the print offset subtle so the bill never moves outside the paper.
+    x: Math.round((Math.random() * 16) - 8),
+    y: Math.round((Math.random() * 10) - 5),
+    rotate: Number(((Math.random() * 1.2) - 0.6).toFixed(2)),
+  }));
 
   const isPaid = Boolean(bill?.paid);
   const grandTotal = Number(totals?.grandTotal || 0);
@@ -120,7 +164,7 @@ export default function BillPreviewView({
               ←
             </span>
 
-            <span className="hidden sm:inline">Editor</span>
+            <span>Back to Edit Bill</span>
           </button>
 
           {/* CENTER TITLE */}
@@ -366,7 +410,7 @@ export default function BillPreviewView({
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-sm font-black text-slate-900">
-                        Receipt & Font Settings
+                        Receipt Settings
                       </h2>
 
                       <span
@@ -536,18 +580,31 @@ export default function BillPreviewView({
                     </div>
 
                     {/* =========================================
-                        FONT SETTINGS
+                        FONT CHANGE
                     ========================================== */}
                     <div className="border-b border-slate-100 p-4 sm:p-5">
                       <SectionTitle
-                        icon="A"
+                        icon="Aa"
                         iconClass="bg-indigo-50 text-indigo-600"
-                        title="Font Settings"
-                        description="Receipt typography & sizing"
+                        title="Font Change"
+                        
                       />
 
-                      <div className="mt-3 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm">
-                        <FontControls {...fontControlProps} />
+                      <div className="mt-3">
+                        <select
+                          value={fontControlProps?.fontFamily || "mono"}
+                          onChange={(event) =>
+                            fontControlProps?.onFontFamilyChange?.(event.target.value)
+                          }
+                          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-xs font-semibold text-slate-800 outline-none transition focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
+                          aria-label="Receipt font family"
+                        >
+                          {FONT_FAMILIES.map((font) => (
+                            <option key={font.id} value={font.id} style={{ fontFamily: font.css }}>
+                              {font.label}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
 
@@ -559,7 +616,7 @@ export default function BillPreviewView({
                         icon="T"
                         iconClass="bg-emerald-50 text-emerald-600"
                         title="Text & Spacing"
-                        description="Control size, bold, top/bottom gaps and alignment"
+                      
                       />
 
                       <div className="mt-3 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm">
@@ -612,124 +669,40 @@ export default function BillPreviewView({
                         </SettingRow>
 
                         <SettingRow
-                          icon="A"
-                          iconClass="bg-violet-50 text-violet-600"
-                          title="Address Font Size"
-                          description="Adjust address text size"
-                        >
-                          <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 p-1">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setAddressFontSize((size) =>
-                                  Math.max(10, size - 1),
-                                )
-                              }
-                              disabled={addressFontSize <= 10}
-                              className="
-                                flex
-                                h-7
-                                w-7
-                                items-center
-                                justify-center
-                                rounded-lg
-                                text-sm
-                                font-bold
-                                text-slate-500
-                                transition
-                                hover:bg-white
-                                hover:text-indigo-600
-                                disabled:cursor-not-allowed
-                                disabled:opacity-30
-                              "
-                            >
-                              −
-                            </button>
-
-                            <span className="min-w-[42px] text-center text-xs font-bold text-slate-700">
-                              {addressFontSize}px
-                            </span>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setAddressFontSize((size) =>
-                                  Math.min(16, size + 1),
-                                )
-                              }
-                              disabled={addressFontSize >= 16}
-                              className="
-                                flex
-                                h-7
-                                w-7
-                                items-center
-                                justify-center
-                                rounded-lg
-                                text-sm
-                                font-bold
-                                text-slate-500
-                                transition
-                                hover:bg-white
-                                hover:text-indigo-600
-                                disabled:cursor-not-allowed
-                                disabled:opacity-30
-                              "
-                            >
-                              +
-                            </button>
-                          </div>
-                        </SettingRow>
-
-                        <SettingRow
-                          icon="—"
+                          icon="≡"
                           iconClass="bg-amber-50 text-amber-600"
                           title="Dashed Divider Lines"
-                          description="Show separator lines on receipt"
+                          description="Show dashed separators on the receipt"
                         >
                           <PremiumToggle
                             checked={showDividerLines}
                             onChange={setShowDividerLines}
                           />
                         </SettingRow>
-                      </div>
 
-                      <div
-                        className="
-                          mt-3
-                          flex
-                          items-center
-                          gap-2
-                          rounded-2xl
-                          border
-                          border-indigo-100
-                          bg-gradient-to-r
-                          from-indigo-50
-                          to-violet-50/70
-                          px-3
-                          py-2.5
-                        "
-                      >
-                        <span
-                          className="
-                            flex
-                            h-5
-                            w-5
-                            shrink-0
-                            items-center
-                            justify-center
-                            rounded-full
-                            bg-indigo-100
-                            text-[10px]
-                            font-black
-                            text-indigo-600
-                          "
+                        <SettingRow
+                          icon="♥"
+                          iconClass="bg-pink-50 text-pink-600"
+                          title="Thank You Message"
+                          description="Choose the footer message"
                         >
-                          i
-                        </span>
+                          <select
+                            value={footerMessage}
+                            onChange={(event) => setFooterMessage(event.target.value)}
+                            className="h-9 max-w-[210px] rounded-xl border border-slate-200 bg-white px-2 text-[11px] font-semibold text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+                          >
+                            <option value="Thank you. Visit Again.">
+                              Thank you. Visit Again.
+                            </option>
+                            <option value="Thank You For Your Visit. Have A Nice Day!">
+                              Thank You For Your Visit. Have A Nice Day!
+                            </option>
+                            <option value="E&OE. Thank you. Visit Again.">
+                              E&amp;OE. Thank you. Visit Again.
+                            </option>
+                          </select>
+                        </SettingRow>
 
-                        <span className="text-[10px] font-semibold text-indigo-600">
-                          Changes update the live preview instantly.
-                        </span>
                       </div>
                     </div>
                   </div>
@@ -861,8 +834,9 @@ export default function BillPreviewView({
                   storageStatus={storageStatus}
                   showPoweredBy={showPoweredBy}
                   showGstLines={showGstLines}
-                  addressFontSize={addressFontSize}
                   showDividerLines={showDividerLines}
+                  footerMessage={footerMessage}
+                  receiptPlacement={receiptPlacement}
                 />
               </div>
 

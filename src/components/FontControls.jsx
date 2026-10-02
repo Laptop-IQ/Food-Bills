@@ -1,14 +1,11 @@
 import React from "react";
 import { FONT_FAMILIES } from "../layout/fonts";
-import { FONT_SIZE_MIN, FONT_SIZE_MAX } from "../layout/constants";
 
 export default function FontControls({
   darkMode,
   fontFamily,
-  fontSize,
   activeFontCss,
   onFontFamilyChange,
-  onFontSizeChange,
   onReset,
 }) {
   const panelBg = darkMode
@@ -49,38 +46,6 @@ export default function FontControls({
             >
               ▼
             </span>
-          </div>
-        </div>
-
-        <div
-          className={`w-px self-stretch ${darkMode ? "bg-[#2a2a2e]" : "bg-gray-100"}`}
-        />
-
-        <div className="flex flex-col gap-1.5 w-36 shrink-0">
-          <div className="flex items-center -mt-9 gap-1.5">
-            <button
-              onClick={() => onFontSizeChange(fontSize - 1)}
-              disabled={fontSize <= FONT_SIZE_MIN}
-              className={`flex items-center justify-center w-7 h-7 rounded-lg font-bold text-sm transition-all shrink-0 ${stepBtn}`}
-            >
-              −
-            </button>
-            <input
-              type="range"
-              min={FONT_SIZE_MIN}
-              max={FONT_SIZE_MAX}
-              value={fontSize}
-              onChange={(e) => onFontSizeChange(Number(e.target.value))}
-              className="flex-1 cursor-pointer h-1.5 min-w-0"
-              style={{ accentColor: "#3b82f6" }}
-            />
-            <button
-              onClick={() => onFontSizeChange(fontSize + 1)}
-              disabled={fontSize >= FONT_SIZE_MAX}
-              className={`flex items-center justify-center w-7 h-7 rounded-lg font-bold text-sm transition-all shrink-0 ${stepBtn}`}
-            >
-              +
-            </button>
           </div>
         </div>
 

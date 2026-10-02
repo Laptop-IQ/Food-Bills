@@ -94,8 +94,7 @@ export default function BillEditorView({
               ${navButton}
             `}
           >
-            <span className="hidden sm:inline">← Back</span>
-            <span className="sm:hidden">←</span>
+            <span className="inline">← Back to Edit Bills</span>
           </button>
 
           <div className="min-w-0 flex-1 px-1">
@@ -113,15 +112,7 @@ export default function BillEditorView({
               >
                 {editingId ? "EDIT" : "NEW"}
               </span>
-
-              <h1 className="truncate text-sm font-bold sm:text-base">
-                {editingId ? "Edit Bill" : "Create New Bill"}
-              </h1>
             </div>
-
-            <p className={`mt-0.5 text-[10px] ${mutedText}`}>
-              {bill.billNo || "New bill"}
-            </p>
           </div>
 
           <div

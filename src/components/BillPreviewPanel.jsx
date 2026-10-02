@@ -18,6 +18,8 @@ export default function BillPreviewPanel({
   showGstLines = true,
   addressFontSize = 12,
   showDividerLines = true,
+  footerMessage = "Thank you. Visit Again.",
+  receiptPlacement = null,
 }) {
   return (
     <div className="w-full">
@@ -50,8 +52,10 @@ export default function BillPreviewPanel({
 
           showPoweredBy={showPoweredBy}
           showGstLines={showGstLines}
-          addressFontSize={addressFontSize}
           showDividerLines={showDividerLines}
+          addressFontSize={addressFontSize}
+          footerMessage={footerMessage}
+          receiptPlacement={receiptPlacement}
         />
       </div>
     </div>

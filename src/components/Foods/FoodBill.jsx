@@ -74,6 +74,14 @@ export default function FoodBill() {
 
   const [selectedField, setSelectedField] = useState(null);
 
+  // Preview-only paper variation. Print CSS resets this to a clean centered receipt.
+  const [receiptPlacement] = useState(() => ({
+    // Subtle random print placement; kept within the paper bounds.
+    x: Math.round((Math.random() * 16) - 8),
+    y: Math.round((Math.random() * 10) - 5),
+    rotate: Number(((Math.random() * 1.2) - 0.6).toFixed(2)),
+  }));
+
   /* =====================================================
      BILL UPDATE
      ===================================================== */
@@ -545,9 +553,10 @@ export default function FoodBill() {
           maxHeight: "none",
           padding: "26px 30px 34px",
           boxShadow:
-            "0 2px 0 #b8ae96, " +
-            "0 4px 0 #a89e86, " +
-            "0 6px 20px rgba(0,0,0,0.28)",
+            "0 18px 38px rgba(15,23,42,0.20), " +
+            "0 5px 12px rgba(15,23,42,0.12)",
+          "--receipt-transform": `translate(${receiptPlacement.x}px, ${receiptPlacement.y}px) rotate(${receiptPlacement.rotate}deg)`,
+          transform: `translate(${receiptPlacement.x}px, ${receiptPlacement.y}px) rotate(${receiptPlacement.rotate}deg)`,
           boxSizing: "border-box",
 
           /*

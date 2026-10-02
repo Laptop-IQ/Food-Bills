@@ -31,9 +31,10 @@ export default function BillReceipt({
   textStyles = DEFAULT_TEXT_STYLES,
   showPoweredBy = true,
   showGstLines = true,
-  addressFontSize = 12,
   showDividerLines = true,
   includeGST = true,
+  footerMessage = "Thank you. Visit Again.",
+  receiptPlacement = null,
 }) {
   const styles = normalizeTextStyles(textStyles);
   const base = Number(fontSize) || 12;
@@ -69,13 +70,29 @@ export default function BillReceipt({
   return (
     <>
       <style>
-        {`\n          @media print {\n            @page { size: 90mm auto; margin: 0; }\n            html, body {\n              width: 90mm !important;\n              min-width: 90mm !important;\n              max-width: 90mm !important;\n              margin: 0 !important;\n              padding: 0 !important;\n              background: #fff !important;\n              -webkit-print-color-adjust: exact !important;\n              print-color-adjust: exact !important;\n            }\n            body * { visibility: hidden !important; }\n            #thermalBill, #thermalBill * { visibility: visible !important; }\n            #thermalBill {\n              position: absolute !important;\n              left: 0 !important;\n              top: 0 !important;\n              width: 80mm !important;\n              min-width: 80mm !important;\n              max-width: 80mm !important;\n              margin: 0 !important;\n              padding: 4mm !important;\n              box-sizing: border-box !important;\n              overflow: visible !important;\n              background: #fff !important;\n              border: 1px solid #e2e2e2 !important;\n              border-radius: 1px !important;\n              box-shadow: none !important;\n              transform: none !important;\n              -webkit-print-color-adjust: exact !important;\n              print-color-adjust: exact !important;\n              page-break-before: avoid !important;\n              page-break-after: avoid !important;\n            }\n            #thermalBill .no-print { display: none !important; visibility: hidden !important; }\n            #thermalBill .print-only { display: block !important; visibility: visible !important; }\n            #thermalBill * { page-break-inside: avoid !important; break-inside: avoid !important; }\n            #thermalBill img { max-width: 100% !important; }\n          }\n          @media screen { #thermalBill .print-only { display: none !important; } }\n        `}
+        {`\n          @media print {\n            @page { size: 90mm auto; margin: 0; }\n            html, body {\n              width: 90mm !important;\n              min-width: 90mm !important;\n              max-width: 90mm !important;\n              margin: 0 !important;\n              padding: 0 !important;\n              background: #fff !important;\n              -webkit-print-color-adjust: exact !important;\n              print-color-adjust: exact !important;\n            }\n            body * { visibility: hidden !important; }\n            #thermalBill, #thermalBill * { visibility: visible !important; }\n            #thermalBill {\n              position: absolute !important;\n              left: 0 !important;\n              top: 0 !important;\n              width: 80mm !important;\n              min-width: 80mm !important;\n              max-width: 80mm !important;\n              margin: 0 !important;\n              padding: 4mm !important;\n              box-sizing: border-box !important;\n              overflow: visible !important;\n              background: #fff !important;\n              border: 1.5px solid #9ca3af !important;\n              border-radius: 1px !important;\n              box-shadow: none !important;\n              transform: var(--receipt-transform) !important;\n              -webkit-print-color-adjust: exact !important;\n              print-color-adjust: exact !important;\n              page-break-before: avoid !important;\n              page-break-after: avoid !important;\n            }\n            #thermalBill .no-print { display: none !important; visibility: hidden !important; }\n            #thermalBill .print-only { display: block !important; visibility: visible !important; }\n            #thermalBill * { page-break-inside: avoid !important; break-inside: avoid !important; }\n            #thermalBill img { max-width: 100% !important; }\n          }\n          @media screen { #thermalBill .print-only { display: none !important; } }\n        `}
       </style>
 
       <div
         id="thermalBill"
-        className="relative mx-auto w-[320px] max-w-full overflow-hidden bg-white p-2 text-black shadow-xl"
-        style={{ fontFamily: activeFontCss, fontSize: `${base}px` }}
+        className="relative mx-auto w-[320px] max-w-full overflow-hidden border border-slate-300 bg-white p-2 text-black shadow-xl receipt-paper"
+        style={{
+          fontFamily: activeFontCss,
+          fontSize: `${base}px`,
+          "--receipt-transform": receiptPlacement
+            ? `translate(${receiptPlacement.x}px, ${receiptPlacement.y}px) rotate(${receiptPlacement.rotate}deg)`
+            : "none",
+          border: "1.5px solid #9ca3af",
+          boxSizing: "border-box",
+          ...(receiptPlacement
+            ? {
+                "--receipt-transform": `translate(${receiptPlacement.x}px, ${receiptPlacement.y}px) rotate(${receiptPlacement.rotate}deg)`,
+                transform: `translate(${receiptPlacement.x}px, ${receiptPlacement.y}px) rotate(${receiptPlacement.rotate}deg)`,
+                boxShadow:
+                  "0 18px 38px rgba(15, 23, 42, 0.20), 0 5px 12px rgba(15, 23, 42, 0.12)",
+              }
+            : {}),
+        }}
       >
         {/* Restaurant header */}
         <div className="text-center">
@@ -103,7 +120,7 @@ export default function BillReceipt({
           {hasValue(bill.address1) && (
             <p
               style={field("address1", {
-                fontSize: `${Number(addressFontSize) * 0.85}px`,
+                fontSize: `${base * 0.85}px`,
                 lineHeight: 1.1,
               })}
             >
@@ -114,7 +131,7 @@ export default function BillReceipt({
           {hasValue(bill.address2) && (
             <p
               style={field("address2", {
-                fontSize: `${Number(addressFontSize) * 0.85}px`,
+                fontSize: `${base * 0.85}px`,
                 lineHeight: 1.1,
               })}
             >
@@ -125,7 +142,7 @@ export default function BillReceipt({
           {hasValue(bill.city) && (
             <p
               style={field("city", {
-                fontSize: `${Number(addressFontSize) * 0.85}px`,
+                fontSize: `${base * 0.85}px`,
                 lineHeight: 1.1,
               })}
             >
@@ -431,7 +448,7 @@ export default function BillReceipt({
               lineHeight: 1.3,
             })}
           >
-            E&amp;OE. Thank you. Visit Again.
+            {footerMessage}
           </p>
 
           {showPoweredBy && (
