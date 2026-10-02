@@ -456,7 +456,7 @@ export default function BillReceipt({
                 </React.Fragment>
               ))
             ) : (
-              <>E&amp;OE. {footerMessage}</>
+              <>{footerMessage}</>
             )}
           </p>
 
