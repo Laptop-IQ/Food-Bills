@@ -20,6 +20,8 @@ export default function BillPreviewView({
   bill = {},
   items = [],
   totals = {},
+  showGstLines = true,
+  onShowGstLinesChange,
   onPrintAndSave,
   onSaveOnly,
   storageStatus,
@@ -38,7 +40,6 @@ export default function BillPreviewView({
       return true;
     }
   });
-  const [showGstLines, setShowGstLines] = useState(true);
   const [showDividerLines, setShowDividerLines] = useState(() => {
     try {
       const saved = localStorage.getItem("foodBills.showDividerLines");
@@ -587,7 +588,7 @@ export default function BillPreviewView({
                         icon="Aa"
                         iconClass="bg-indigo-50 text-indigo-600"
                         title="Font Change"
-                        
+                        description="Change the receipt font family"
                       />
 
                       <div className="mt-3">
@@ -616,7 +617,7 @@ export default function BillPreviewView({
                         icon="T"
                         iconClass="bg-emerald-50 text-emerald-600"
                         title="Text & Spacing"
-                      
+                        description="Control size, bold, top/bottom gaps and alignment"
                       />
 
                       <div className="mt-3 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm">
@@ -664,7 +665,7 @@ export default function BillPreviewView({
                         >
                           <PremiumToggle
                             checked={showGstLines}
-                            onChange={setShowGstLines}
+                            onChange={onShowGstLinesChange}
                           />
                         </SettingRow>
 
@@ -694,8 +695,8 @@ export default function BillPreviewView({
                             <option value="Thank you. Visit Again.">
                               Thank you. Visit Again.
                             </option>
-                            <option value="Thank You For Your Visit. Have A Nice Day!">
-                              Thank You For Your Visit. Have A Nice Day!
+                            <option value={"Thank You For Your Visit.\nHave A Nice Day!"}>
+                              Thank You For Your Visit. / Have A Nice Day!
                             </option>
                             <option value="E&OE. Thank you. Visit Again.">
                               E&amp;OE. Thank you. Visit Again.
@@ -703,6 +704,45 @@ export default function BillPreviewView({
                           </select>
                         </SettingRow>
 
+                      </div>
+
+                      <div
+                        className="
+                          mt-3
+                          flex
+                          items-center
+                          gap-2
+                          rounded-2xl
+                          border
+                          border-indigo-100
+                          bg-gradient-to-r
+                          from-indigo-50
+                          to-violet-50/70
+                          px-3
+                          py-2.5
+                        "
+                      >
+                        <span
+                          className="
+                            flex
+                            h-5
+                            w-5
+                            shrink-0
+                            items-center
+                            justify-center
+                            rounded-full
+                            bg-indigo-100
+                            text-[10px]
+                            font-black
+                            text-indigo-600
+                          "
+                        >
+                          i
+                        </span>
+
+                        <span className="text-[10px] font-semibold text-indigo-600">
+                          Changes update the live preview instantly.
+                        </span>
                       </div>
                     </div>
                   </div>

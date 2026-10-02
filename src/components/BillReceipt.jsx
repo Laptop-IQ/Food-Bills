@@ -448,7 +448,16 @@ export default function BillReceipt({
               lineHeight: 1.3,
             })}
           >
-            {footerMessage}
+            {footerMessage.includes("\n") ? (
+              footerMessage.split("\n").map((line, index) => (
+                <React.Fragment key={`${line}-${index}`}>
+                  {index > 0 && <br />}
+                  {line}
+                </React.Fragment>
+              ))
+            ) : (
+              <>E&amp;OE. {footerMessage}</>
+            )}
           </p>
 
           {showPoweredBy && (

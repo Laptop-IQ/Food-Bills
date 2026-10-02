@@ -60,6 +60,22 @@ export default function ThermalBill() {
   const [fontSize, setFontSize] = useState(FONT_SIZE_DEFAULT);
   const [darkMode, setDarkMode] = useState(false);
 
+  // Tax breakdown controls both GST calculation and display.
+  const [showGstLines, setShowGstLines] = useState(() => {
+    try {
+      const saved = localStorage.getItem("foodBills.showGstLines");
+      return saved === null ? true : saved === "true";
+    } catch {
+      return true;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("foodBills.showGstLines", String(showGstLines));
+    } catch {}
+  }, [showGstLines]);
+
   // Per-field receipt typography/spacing. These settings are saved with each bill.
   const [textStyles, setTextStyles] = useState(() => cloneDefaultTextStyles());
   const [selectedTextField, setSelectedTextField] = useState("gst");
@@ -251,8 +267,14 @@ export default function ThermalBill() {
     0,
   );
 
-  const cgst = subtotal * 0.025;
-  const sgst = subtotal * 0.025;
+  // GST is calculated only when the tax breakdown is enabled AND a GST
+  // number is actually present. Removing the GST number therefore removes
+  // GST from the calculation as well.
+  const hasGstNumber = String(bill.gst ?? "").trim() !== "";
+  const gstEnabled = showGstLines && hasGstNumber;
+
+  const cgst = gstEnabled ? subtotal * 0.025 : 0;
+  const sgst = gstEnabled ? subtotal * 0.025 : 0;
 
   const actualTotal = subtotal + cgst + sgst;
 
@@ -820,6 +842,8 @@ export default function ThermalBill() {
           bill={bill}
           items={items}
           totals={totals}
+          showGstLines={showGstLines}
+          onShowGstLinesChange={setShowGstLines}
           onPrintAndSave={printAndSave}
           onSaveOnly={saveBill}
           storageStatus={storageStatus}
