@@ -244,17 +244,20 @@ export default function BillReceipt({
         {/* Items */}
         <div>
           <div
-            className="flex"
+            className="grid items-center"
             style={field("itemsHeader", {
               fontSize: `${base * 1.05}px`,
               fontWeight: 700,
               lineHeight: 1.25,
+              gridTemplateColumns: "minmax(0, 1fr) 30px 50px 62px",
+              columnGap: "5px",
+              width: "100%",
             })}
           >
-            <div className="w-[50%]">Item</div>
-            <div className="w-[15%] text-center">Qty</div>
-            <div className="w-[15%] text-center">Rate</div>
-            <div className="w-[20%] text-right">Total</div>
+            <div className="min-w-0">Item</div>
+            <div className="text-center whitespace-nowrap">Qty</div>
+            <div className="text-right whitespace-nowrap">Rate</div>
+            <div className="text-right whitespace-nowrap">Total</div>
           </div>
 
           {items.map((item, index) => {
@@ -268,13 +271,21 @@ export default function BillReceipt({
 
             return (
               <div key={item?.id ?? `item-${index}`}>
-                <div className="flex" style={itemStyle}>
-                  <div className="w-[50%] break-words pr-1">
+                <div
+                  className="grid items-center"
+                  style={{
+                    ...itemStyle,
+                    gridTemplateColumns: "minmax(0, 1fr) 30px 50px 62px",
+                    columnGap: "5px",
+                    width: "100%",
+                  }}
+                >
+                  <div className="min-w-0 break-words pr-1">
                     {index + 1}. {item?.name || "Item"}
                   </div>
-                  <div className="w-[15%] text-center">{qty}</div>
-                  <div className="w-[15%] text-center">{rate.toFixed(2)}</div>
-                  <div className="w-[20%] text-right">{amount.toFixed(2)}</div>
+                  <div className="text-center whitespace-nowrap">{qty}</div>
+                  <div className="text-right whitespace-nowrap">{rate.toFixed(2)}</div>
+                  <div className="text-right whitespace-nowrap">{amount.toFixed(2)}</div>
                 </div>
               </div>
             );
@@ -456,7 +467,7 @@ export default function BillReceipt({
                 </React.Fragment>
               ))
             ) : (
-              <>{footerMessage}</>
+              <> {footerMessage}</>
             )}
           </p>
 
