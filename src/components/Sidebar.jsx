@@ -1,4 +1,4 @@
-import { memo, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   ReceiptIcon,
@@ -12,6 +12,7 @@ import {
   CreditCard,
   Smartphone,
   BarChart3,
+  Pin,
 } from "lucide-react";
 
 /* -------------------------------------------------------
@@ -151,8 +152,33 @@ const SidebarNavItem = memo(function SidebarNavItem({ item }) {
    Sidebar
 ------------------------------------------------------- */
 
-function Sidebar() {
+const OPEN_DELAY = 120; // ms — avoids accidental opens when the cursor grazes the edge
+const CLOSE_DELAY = 280; // ms — grace period so the panel never flickers
+
+function Sidebar({ pinned = false, onTogglePinned }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  /* Desktop hover / focus state */
+  const [hovered, setHovered] = useState(false);
+  const timerRef = useRef(null);
+  const asideRef = useRef(null);
+
+  const clearTimer = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  const scheduleHover = useCallback((next, delay) => {
+    clearTimer();
+    timerRef.current = setTimeout(() => setHovered(next), delay);
+  }, []);
+
+  useEffect(() => clearTimer, []);
+
+  // Desktop panel is visible when pinned or while hovered / focused
+  const desktopOpen = pinned || hovered;
 
   const openMobile = () => {
     setMobileOpen(true);
@@ -235,7 +261,7 @@ function Sidebar() {
         aria-hidden={!mobileOpen}
         onClick={closeMobile}
         className={[
-          "fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px]",
+          "fixed inset-0 z-40 bg-black/60 backdrop-blur-[2px] md:hidden",
           "transition-opacity duration-300",
           mobileOpen
             ? "pointer-events-auto opacity-100"
@@ -248,23 +274,65 @@ function Sidebar() {
           Desktop par hidden
       ================================================= */}
 
+      <div
+        className="
+          fixed left-0 top-0 z-[45]
+          hidden h-dvh w-3
+          md:block print:hidden
+        "
+        onMouseEnter={() => scheduleHover(true, OPEN_DELAY)}
+        onMouseLeave={() => scheduleHover(false, CLOSE_DELAY)}
+      >
+        <button
+          type="button"
+          aria-label="Open navigation sidebar"
+          onClick={() => {
+            clearTimer();
+            setHovered(true);
+          }}
+          className={[
+            "absolute left-0 top-1/2 h-16 w-1.5 -translate-y-1/2",
+            "rounded-r-full bg-white/35",
+            "transition-all duration-300",
+            "hover:w-2 hover:bg-[#8B72FF]/70",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8B72FF]/60",
+            desktopOpen ? "pointer-events-none opacity-0" : "opacity-100",
+          ].join(" ")}
+        />
+      </div>
+
       <aside
+        ref={asideRef}
         id="mobile-navigation"
         aria-label="Main navigation"
+        onMouseEnter={() => scheduleHover(true, 0)}
+        onMouseLeave={() => scheduleHover(false, CLOSE_DELAY)}
+        onFocusCapture={() => scheduleHover(true, 0)}
+        onBlurCapture={(e) => {
+          if (!asideRef.current?.contains(e.relatedTarget)) {
+            scheduleHover(false, CLOSE_DELAY);
+          }
+        }}
         className={[
           "fixed left-0 top-0 z-50",
           "flex h-dvh w-[260px] flex-col",
           "border-r border-white/[0.06]",
           "bg-[#11101A]",
-          "shadow-[12px_0_40px_rgba(0,0,0,.12)]",
           "overflow-hidden",
-          "transition-transform duration-300 ease-out",
+          "will-change-transform",
+          "transition-[transform,box-shadow] duration-300",
+          "ease-[cubic-bezier(0.22,1,0.36,1)]",
+          "motion-reduce:transition-none",
+          "print:hidden",
 
-          /* IMPORTANT:
-             Desktop par sidebar completely hidden */
-          "md:hidden",
-
+          /* Mobile: slide-in drawer */
           mobileOpen ? "translate-x-0" : "-translate-x-full",
+
+          /* Desktop: hover to reveal, pin to fix */
+          desktopOpen ? "md:translate-x-0" : "md:-translate-x-full",
+          pinned
+            ? "shadow-none"
+            : "shadow-[12px_0_40px_rgba(0,0,0,.12)] md:shadow-[16px_0_48px_rgba(0,0,0,.45)]",
         ].join(" ")}
       >
         {/* Ambient glow */}
@@ -351,13 +419,39 @@ function Sidebar() {
             </div>
           </div>
 
-          {/* Close */}
+          {/* Pin (desktop) */}
+          <button
+            type="button"
+            onClick={onTogglePinned}
+            aria-pressed={pinned}
+            aria-label={pinned ? "Unpin sidebar" : "Pin sidebar"}
+            title={pinned ? "Unpin sidebar" : "Pin sidebar"}
+            className={[
+              "hidden h-8 w-8 shrink-0 items-center justify-center md:flex",
+              "rounded-lg transition-colors duration-200 active:scale-95",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#8B72FF]/60",
+              pinned
+                ? "bg-[#6D4AFF]/20 text-[#B6A6FF]"
+                : "text-slate-500 hover:bg-white/[0.05] hover:text-white",
+            ].join(" ")}
+          >
+            <Pin
+              aria-hidden="true"
+              strokeWidth={1.8}
+              className={[
+                "h-4 w-4 transition-transform duration-300",
+                pinned ? "rotate-0 fill-current" : "rotate-45",
+              ].join(" ")}
+            />
+          </button>
+
+          {/* Close (mobile) */}
           <button
             type="button"
             onClick={closeMobile}
             aria-label="Close navigation menu"
             className="
-              flex h-8 w-8 items-center justify-center
+              flex h-8 w-8 items-center justify-center md:hidden
               rounded-lg
               text-slate-400
               transition
@@ -454,7 +548,7 @@ function Sidebar() {
           Header spacing
       ================================================= */}
 
-      <div className="h-14" />
+      <div className="h-14 md:hidden" />
     </>
   );
 }

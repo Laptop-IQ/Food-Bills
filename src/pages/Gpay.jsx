@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Download, ChevronDown, Bell, BellRing } from "lucide-react";
 import { toPng } from "html-to-image";
+import DateTimePicker from "../components/DateTimePicker";
 import "./Gpay.css";
 
 const initial = {
@@ -77,20 +78,37 @@ function Gpay() {
           </p>
 
           <div>
-            {Object.entries(fields).map(([key, label]) => (
-              <label className="mb-3 block" key={key}>
-                <span className="mb-1 block text-xs font-semibold text-black">
-                  {label}
-                </span>
-
+            {Object.entries(fields).map(([key, label]) => {
+              const input = (
                 <input
                   type="text"
                   value={data[key]}
                   onChange={updateField(key)}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-black outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-200"
                 />
+              );
+              return (
+              <label className="mb-3 block" key={key}>
+                <span className="mb-1 block text-xs font-semibold text-black">
+                  {label}
+                </span>
+
+                {key === "date" || key === "time" ? (
+                  <DateTimePicker
+                    mode={key}
+                    dateFormat="DD MMMS YYYY"
+                    timeFormat="h:mm a"
+                    value={data[key]}
+                    onChange={(v) => setData((prev) => ({ ...prev, [key]: v }))}
+                  >
+                    {input}
+                  </DateTimePicker>
+                ) : (
+                  input
+                )}
               </label>
-            ))}
+              );
+            })}
           </div>
 
           <button

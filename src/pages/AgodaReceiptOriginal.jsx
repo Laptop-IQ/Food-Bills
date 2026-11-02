@@ -9,6 +9,7 @@ import {
   Receipt,
   Check,
 } from "lucide-react";
+import DateTimePicker from "../components/DateTimePicker";
 
 /* =========================================================
    CONSTANTS
@@ -1067,11 +1068,26 @@ export default function AgodaReceiptOriginal() {
           <div className="flex gap-2 items-center min-w-0">
             <span className="w-28 shrink-0">Payment Date</span>
 
-            <EditableField
-              isEditing={isEditing}
-              value={formData.paymentDate}
-              onChange={(value) => updateField("paymentDate", value)}
-            />
+            {isEditing ? (
+              <DateTimePicker
+                mode="date"
+                dateFormat="MMMM D, YYYY"
+                value={formData.paymentDate}
+                onChange={(value) => updateField("paymentDate", value)}
+              >
+                <EditableField
+                  isEditing={isEditing}
+                  value={formData.paymentDate}
+                  onChange={(value) => updateField("paymentDate", value)}
+                />
+              </DateTimePicker>
+            ) : (
+              <EditableField
+                isEditing={isEditing}
+                value={formData.paymentDate}
+                onChange={(value) => updateField("paymentDate", value)}
+              />
+            )}
           </div>
         </div>
 

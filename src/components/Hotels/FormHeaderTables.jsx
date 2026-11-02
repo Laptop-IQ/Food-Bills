@@ -1,5 +1,25 @@
 import { Cell, NormalCell } from "./FormCells";
 import { TD, LBL, HDR } from "./cellStyles";
+import DateTimePicker from "../DateTimePicker";
+
+// Cell with a date/time picker while editing
+function PickCell({ mode, dateFormat, timeFormat, value, onChange, editing, align }) {
+  const cell = (
+    <Cell value={value} onChange={onChange} editing={editing} align={align} />
+  );
+  if (!editing) return cell;
+  return (
+    <DateTimePicker
+      mode={mode}
+      dateFormat={dateFormat}
+      timeFormat={timeFormat}
+      value={value}
+      onChange={onChange}
+    >
+      {cell}
+    </DateTimePicker>
+  );
+}
 
 export default function FormHeaderTables({ d, set, editing }) {
   return (
@@ -179,7 +199,9 @@ export default function FormHeaderTables({ d, set, editing }) {
             <td className={LBL}>Date :</td>
 
             <td className={TD}>
-              <Cell
+              <PickCell
+                mode="date"
+                dateFormat="DD/MM/YYYY"
                 value={d.date}
                 onChange={(v) => set("date", v)}
                 editing={editing}
@@ -278,7 +300,9 @@ export default function FormHeaderTables({ d, set, editing }) {
               <td className={LBL}>Time</td>
 
               <td className={TD}>
-                <Cell
+                <PickCell
+                  mode="time"
+                  timeFormat="h:mm A"
                   value={d.timeDep}
                   onChange={(v) => set("timeDep", v)}
                   editing={editing}
@@ -302,7 +326,9 @@ export default function FormHeaderTables({ d, set, editing }) {
               <td className={LBL}>Time</td>
 
               <td className={TD}>
-                <Cell
+                <PickCell
+                  mode="time"
+                  timeFormat="h:mm A"
                   value={d.timeArr}
                   onChange={(v) => set("timeArr", v)}
                   editing={editing}

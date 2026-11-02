@@ -6,6 +6,7 @@ export default function SFDyesToolbar({
   onSave,
   onPrint,
   onNew,
+  onTemplates,
 }) {
   return (
     <div className="w-full max-w-[920px] mb-4 print:hidden">
@@ -182,6 +183,43 @@ export default function SFDyesToolbar({
             <span className="hidden sm:inline">
               {saveFlash ? "Saved" : "Save"}
             </span>
+          </button>
+
+          {/* Templates */}
+          <button
+            type="button"
+            onClick={onTemplates}
+            title="Templates"
+            className="
+              group flex h-9 items-center gap-2
+              rounded-xl
+              border border-slate-200
+              bg-white
+              px-3
+              text-xs font-semibold text-slate-700
+              transition-all duration-200
+              hover:border-indigo-200
+              hover:bg-indigo-50
+              hover:text-indigo-700
+              active:scale-95
+              focus:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-indigo-500/30
+            "
+          >
+            <svg
+              className="h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <path d="M3 9h18" />
+              <path d="M9 21V9" />
+            </svg>
+
+            <span className="hidden md:inline">Templates</span>
           </button>
 
           {/* Print */}

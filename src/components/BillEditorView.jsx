@@ -2,6 +2,7 @@ import React from "react";
 import { VIEW } from "../layout/constants";
 import BillPreviewPanel from "./BillPreviewPanel";
 import TextStyleControls from "./TextStyleControls";
+import DateTimePicker from "./DateTimePicker";
 
 const EDITOR_FIELDS = [
   ["title", "Restaurant Name", false],
@@ -240,8 +241,13 @@ export default function BillEditorView({
 
             {/* Fields */}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {EDITOR_FIELDS.map(([field, placeholder, fullWidth]) => (
-                <label key={field} className={fullWidth ? "sm:col-span-2" : ""}>
+              {EDITOR_FIELDS.map(([field, placeholder, fullWidth]) => {
+                const Wrapper = field === "date" ? "div" : "label";
+                return (
+                <Wrapper
+                  key={field}
+                  className={fullWidth ? "sm:col-span-2" : ""}
+                >
                   <span
                     className={`
                         mb-1.5 block
@@ -255,19 +261,29 @@ export default function BillEditorView({
                     {placeholder}
                   </span>
 
-                  <input
-                    className={inputClass}
-                    value={bill[field] ?? ""}
-                    placeholder={placeholder}
-                    onChange={(e) =>
-                      setBill({
-                        ...bill,
-                        [field]: e.target.value,
-                      })
-                    }
-                  />
-                </label>
-              ))}
+                  {field === "date" ? (
+                    <DateTimePicker
+                      value={bill.date ?? ""}
+                      darkMode={darkMode}
+                      inputClass={inputClass}
+                      onChange={(date) => setBill({ ...bill, date })}
+                    />
+                  ) : (
+                    <input
+                      className={inputClass}
+                      value={bill[field] ?? ""}
+                      placeholder={placeholder}
+                      onChange={(e) =>
+                        setBill({
+                          ...bill,
+                          [field]: e.target.value,
+                        })
+                      }
+                    />
+                  )}
+                </Wrapper>
+                );
+              })}
             </div>
 
             {/* Text styling */}

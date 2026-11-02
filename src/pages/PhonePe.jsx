@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Download, ChevronUp, ReceiptText, List, ShieldCheck } from "lucide-react";
 import { toPng } from "html-to-image";
+import DateTimePicker from "../components/DateTimePicker";
 import "./PhonePe.css";
 
 const initial = {
@@ -65,20 +66,37 @@ function PhonePe() {
               ["utr", "UTR", "751746107630"],
               ["date", "Date", "20 Mar 2026"],
               ["time", "Time", "09:46 PM"],
-            ].map(([key, label, placeholder]) => (
-              <label key={key} className="block">
-                <span className="mb-1 block text-xs font-semibold text-black">
-                  {label}
-                </span>
-
+            ].map(([key, label, placeholder]) => {
+              const input = (
                 <input
                   value={data[key]}
                   onChange={update(key)}
                   placeholder={placeholder}
                   className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm text-black outline-none transition focus:border-purple-500 focus:ring-2 focus:ring-purple-100"
                 />
-              </label>
-            ))}
+              );
+              return (
+                <label key={key} className="block">
+                  <span className="mb-1 block text-xs font-semibold text-black">
+                    {label}
+                  </span>
+
+                  {key === "date" || key === "time" ? (
+                    <DateTimePicker
+                      mode={key}
+                      dateFormat="DD MMM YYYY"
+                      timeFormat="hh:mm A"
+                      value={data[key]}
+                      onChange={(v) => setData((d) => ({ ...d, [key]: v }))}
+                    >
+                      {input}
+                    </DateTimePicker>
+                  ) : (
+                    input
+                  )}
+                </label>
+              );
+            })}
           </div>
 
           <button

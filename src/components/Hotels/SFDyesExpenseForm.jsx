@@ -6,12 +6,19 @@ import { buildInitialState } from "./formState";
 import { ni } from "./numberUtils";
 import { loadRecords, saveRecords } from "./recordsApi";
 import { generatePrintHTML } from "./printTemplate";
+import {
+  loadTemplates,
+  saveTemplates,
+  buildTemplateData,
+  createTemplateId,
+} from "./expenseTemplatesStorage";
 
 import SFDyesToolbar from "./SFDyesToolbar";
 import FormHeaderTables from "./FormHeaderTables";
 import ExpenseTable from "./ExpenseTable";
 import SignatureBlock from "./SignatureBlock";
 import SavedRecordsPanel from "./SavedRecordsPanel";
+import ExpenseTemplatesModal from "./ExpenseTemplatesModal";
 
 import { Toast, ConfirmModal } from "../FeedbackUI";
 
@@ -23,6 +30,10 @@ export default function SFDyesExpenseForm() {
   ───────────────────────────────────────────── */
 
   const [savedRecords, setSavedRecords] = useState(() => loadRecords());
+
+  const [templates, setTemplates] = useState(() => loadTemplates());
+
+  const [templatesOpen, setTemplatesOpen] = useState(false);
 
   const [selectedId, setSelectedId] = useState(null);
 
@@ -48,6 +59,10 @@ export default function SFDyesExpenseForm() {
   useEffect(() => {
     saveRecords(savedRecords);
   }, [savedRecords]);
+
+  useEffect(() => {
+    saveTemplates(templates);
+  }, [templates]);
 
   useEffect(() => {
     return () => {
@@ -381,6 +396,120 @@ export default function SFDyesExpenseForm() {
   }, [showToast]);
 
   /* ─────────────────────────────────────────────
+     Templates
+  ───────────────────────────────────────────── */
+
+  const saveTemplate = useCallback(
+    (name, includeDateVoucher) => {
+      const now = new Date().toISOString();
+      const data = buildTemplateData(dataRef.current, includeDateVoucher);
+      const existing = templates.find(
+        (t) => t.name.toLowerCase() === name.toLowerCase(),
+      );
+
+      setTemplates((prev) =>
+        existing
+          ? prev.map((t) =>
+              t.id === existing.id
+                ? { ...t, name, data, includeDateVoucher, updatedAt: now }
+                : t,
+            )
+          : [
+              {
+                id: createTemplateId(),
+                name,
+                data,
+                includeDateVoucher,
+                createdAt: now,
+                updatedAt: now,
+              },
+              ...prev,
+            ],
+      );
+
+      showToast({
+        type: "success",
+        title: existing ? "Template updated" : "Template saved",
+        message: `"${name}" is ready to reuse.`,
+        duration: 2200,
+      });
+    },
+    [templates, showToast],
+  );
+
+  const overwriteTemplate = useCallback(
+    (id) => {
+      const target = templates.find((t) => t.id === id);
+      if (!target) return;
+
+      setTemplates((prev) =>
+        prev.map((t) =>
+          t.id === id
+            ? {
+                ...t,
+                data: buildTemplateData(
+                  dataRef.current,
+                  Boolean(t.includeDateVoucher),
+                ),
+                updatedAt: new Date().toISOString(),
+              }
+            : t,
+        ),
+      );
+
+      showToast({
+        type: "success",
+        title: "Template updated",
+        message: `"${target.name}" now matches the current form.`,
+        duration: 2200,
+      });
+    },
+    [templates, showToast],
+  );
+
+  const deleteTemplate = useCallback(
+    (id) => {
+      setTemplates((prev) => prev.filter((t) => t.id !== id));
+
+      showToast({
+        type: "success",
+        title: "Template deleted",
+        message: "The template was removed.",
+        duration: 2000,
+      });
+    },
+    [showToast],
+  );
+
+  const useTemplate = useCallback(
+    (template) => {
+      setD({
+        ...buildInitialState(),
+        ...template.data,
+      });
+
+      setSelectedId(null);
+
+      setEditing(true);
+
+      setTemplatesOpen(false);
+
+      showToast({
+        type: "info",
+        title: "Template applied",
+        message: `"${template.name}" loaded as a new record.`,
+        duration: 2500,
+      });
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    },
+    [showToast],
+  );
+
+  /* ─────────────────────────────────────────────
      Render
   ───────────────────────────────────────────── */
 
@@ -421,6 +550,7 @@ export default function SFDyesExpenseForm() {
           onSave={() => saveRecord()}
           onPrint={handlePrint}
           onNew={handleNew}
+          onTemplates={() => setTemplatesOpen(true)}
         />
 
         {/* ─────────────────────────────
@@ -592,6 +722,16 @@ export default function SFDyesExpenseForm() {
       {/* ─────────────────────────────────
           Global Toast
       ───────────────────────────────── */}
+
+      <ExpenseTemplatesModal
+        open={templatesOpen}
+        onClose={() => setTemplatesOpen(false)}
+        templates={templates}
+        onSave={saveTemplate}
+        onUse={useTemplate}
+        onOverwrite={overwriteTemplate}
+        onDelete={deleteTemplate}
+      />
 
       <Toast toast={toast} onClose={closeToast} />
 

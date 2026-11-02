@@ -1,5 +1,6 @@
 import { Field, Hr } from "./ReceiptControls";
 import { FONT } from "./foodBillConstants";
+import DateTimePicker from "../DateTimePicker";
 
 const hasValue = (value) => String(value ?? "").trim() !== "";
 
@@ -160,17 +161,24 @@ export default function ReceiptHeader({
           {hasTime && (
             <span>
               Time :{" "}
-              <Field
-                fieldKey="time"
+              <DateTimePicker
+                mode="time"
+                timeFormat="HH:mm"
                 value={bill.time}
                 onChange={(v) => onChange("time", v)}
-                onActivate={onActivate}
-                textStyle={textStyles.time}
-                style={{
-                  fontSize: "12.5px",
-                  width: "52px",
-                }}
-              />
+              >
+                <Field
+                  fieldKey="time"
+                  value={bill.time}
+                  onChange={(v) => onChange("time", v)}
+                  onActivate={onActivate}
+                  textStyle={textStyles.time}
+                  style={{
+                    fontSize: "12.5px",
+                    width: "52px",
+                  }}
+                />
+              </DateTimePicker>
             </span>
           )}
         </div>
@@ -241,16 +249,23 @@ export default function ReceiptHeader({
             <tr>
               {hasDate && (
                 <td>
-                  <Field
-                    fieldKey="date"
+                  <DateTimePicker
+                    mode="date"
+                    dateFormat="DD/MM/YY"
                     value={bill.date}
                     onChange={(v) => onChange("date", v)}
-                    onActivate={onActivate}
-                    textStyle={textStyles.date}
-                    style={{
-                      width: "64px",
-                    }}
-                  />
+                  >
+                    <Field
+                      fieldKey="date"
+                      value={bill.date}
+                      onChange={(v) => onChange("date", v)}
+                      onActivate={onActivate}
+                      textStyle={textStyles.date}
+                      style={{
+                        width: "64px",
+                      }}
+                    />
+                  </DateTimePicker>
                 </td>
               )}
 
