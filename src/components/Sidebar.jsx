@@ -4,6 +4,12 @@ import { NavLink } from "react-router-dom";
 /* Same routes as before, grouped. Remix Icon only: line = idle, fill = active. */
 const SECTIONS = [
   {
+    label: "Overview",
+    items: [
+      { to: "/bill-dashboard", label: "Bills Dashboard", icon: "bar-chart-2" },
+    ],
+  },
+  {
     label: "Bills",
     items: [
       { to: "/", label: "Thermal Bill", icon: "file-list-3", end: true },
@@ -25,10 +31,6 @@ const SECTIONS = [
       { to: "/Gpay", label: "G-Pay UPI", icon: "smartphone" },
       { to: "/phonepe", label: "PhonePe UPI", icon: "bank-card" },
     ],
-  },
-  {
-    label: "Overview",
-    items: [{ to: "/bill-dashboard", label: "Bills Dashboard", icon: "bar-chart-2" }],
   },
 ];
 
