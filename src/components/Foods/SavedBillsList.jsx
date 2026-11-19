@@ -110,474 +110,142 @@ export default function SavedBillsList({ onOpenBill }) {
   };
 
   return (
-    <section
-      className="saved-bills no-print"
-      aria-label="Saved bills"
-      style={{
-        width: "100%",
-        maxWidth: "520px",
-        marginTop: "26px",
-        boxSizing: "border-box",
-      }}
-    >
-      {/* =================================================
-          HEADER
-          ================================================= */}
-
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "12px",
-          marginBottom: "12px",
-        }}
-      >
+    <section className="saved-bills no-print mt-10" aria-label="Saved bills">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            <span
-              style={{
-                width: "28px",
-                height: "28px",
-                borderRadius: "7px",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "#25221d",
-                color: "#f4d58d",
-                fontSize: "14px",
-                boxShadow: "0 2px 6px rgba(0,0,0,0.16)",
-              }}
-            >
-              ▣
-            </span>
-
-            <h3
-              style={{
-                margin: 0,
-                color: "#25221d",
-                fontSize: "17px",
-                fontWeight: 700,
-                letterSpacing: "0.2px",
-              }}
-            >
-              Saved Bills
-            </h3>
-
+          <h2 className="font-display text-xl font-semibold tracking-tight">
+            Saved bills
             {bills.length > 0 && (
-              <span
-                style={{
-                  minWidth: "22px",
-                  height: "22px",
-                  padding: "0 6px",
-                  boxSizing: "border-box",
-                  borderRadius: "11px",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background: "#e8d4a4",
-                  color: "#4b3b1d",
-                  fontSize: "11px",
-                  fontWeight: 700,
-                }}
-              >
+              <span className="ml-2 rounded-sm bg-neutral-bg px-1.5 py-0.5 font-sans text-xs font-medium text-slate-muted">
                 {bills.length}
               </span>
             )}
-          </div>
-
-          <div
-            style={{
-              marginTop: "3px",
-              marginLeft: "36px",
-              color: "#8b8375",
-              fontSize: "11px",
-            }}
-          >
-            Your saved billing history
-          </div>
+          </h2>
+          <p className="mt-0.5 text-sm text-slate-muted">
+            Your saved billing history.
+          </p>
         </div>
-      </div>
 
-      {/* =================================================
-          EMPTY STATE
-          ================================================= */}
-
-      {bills.length === 0 && (
-        <div
-          style={{
-            background: "linear-gradient(145deg, #fffdf7, #f5efe2)",
-            border: "1px solid #ded5c3",
-            borderRadius: "10px",
-            padding: "30px 20px",
-            textAlign: "center",
-            boxShadow: "0 4px 14px rgba(65, 55, 40, 0.08)",
-          }}
-        >
-          <div
-            style={{
-              width: "52px",
-              height: "52px",
-              margin: "0 auto 12px",
-              borderRadius: "50%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#eee5d2",
-              color: "#796744",
-              fontSize: "23px",
-            }}
-          >
-            ▤
-          </div>
-
-          <div
-            style={{
-              color: "#39352e",
-              fontSize: "14px",
-              fontWeight: 700,
-              marginBottom: "5px",
-            }}
-          >
-            No saved bills yet
-          </div>
-
-          <div
-            style={{
-              color: "#918879",
-              fontSize: "11.5px",
-              lineHeight: 1.5,
-              maxWidth: "280px",
-              margin: "0 auto",
-            }}
-          >
-            Create a bill and tap <strong>Save Bill</strong>. Your billing
-            history will appear here.
-          </div>
-        </div>
-      )}
-
-      {/* =================================================
-          SEARCH
-          ================================================= */}
-
-      {bills.length > 0 && (
-        <>
-          <div
-            style={{
-              position: "relative",
-              marginBottom: "10px",
-            }}
-          >
-            <span
-              style={{
-                position: "absolute",
-                left: "12px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                color: "#8d8578",
-                fontSize: "14px",
-                pointerEvents: "none",
-              }}
-            >
-              ⌕
-            </span>
-
+        {bills.length > 0 && (
+          <div className="relative w-full sm:w-80">
+            <i
+              aria-hidden="true"
+              className="ri-search-line pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[18px] leading-none text-slate-muted"
+            />
             <input
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search bill no, customer, table..."
+              placeholder="Search bill no, customer, table"
               aria-label="Search saved bills"
-              style={{
-                width: "100%",
-                height: "38px",
-                boxSizing: "border-box",
-                padding: "0 12px 0 34px",
-                border: "1px solid #d7cebe",
-                borderRadius: "8px",
-                background: "#fffdf8",
-                color: "#27231e",
-                outline: "none",
-                fontSize: "12px",
-                boxShadow: "0 2px 7px rgba(70,60,45,0.05)",
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = "#a58a54";
-                e.currentTarget.style.boxShadow =
-                  "0 0 0 3px rgba(165,138,84,0.12)";
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = "#d7cebe";
-                e.currentTarget.style.boxShadow =
-                  "0 2px 7px rgba(70,60,45,0.05)";
-              }}
+              className="h-10 w-full rounded-md border border-line bg-white pl-10 pr-3 text-sm outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-slate-400 focus:border-forest-700 focus:ring-2 focus:ring-forest-700/15"
             />
           </div>
+        )}
+      </div>
 
-          {/* =================================================
-              NO SEARCH RESULTS
-              ================================================= */}
+      {bills.length === 0 && (
+        <div className="rounded-md border border-dashed border-line bg-white px-6 py-12 text-center">
+          <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-md bg-forest-50 text-forest-700">
+            <i
+              aria-hidden="true"
+              className="ri-file-list-3-line text-[22px] leading-none"
+            />
+          </span>
+          <h3 className="font-display text-base font-semibold tracking-tight">
+            No saved bills yet
+          </h3>
+          <p className="mx-auto mt-1 max-w-sm text-sm text-slate-muted">
+            Create a bill and choose Save bill. Your billing history will appear
+            here.
+          </p>
+        </div>
+      )}
 
-          {filteredBills.length === 0 && (
-            <div
-              style={{
-                padding: "20px",
-                textAlign: "center",
-                color: "#8b8375",
-                fontSize: "12px",
-                background: "#faf7f0",
-                border: "1px dashed #d5cbb9",
-                borderRadius: "9px",
-              }}
-            >
-              No bills found for <strong>"{search}"</strong>
-            </div>
-          )}
+      {bills.length > 0 && filteredBills.length === 0 && (
+        <div className="rounded-md border border-line bg-white px-6 py-10 text-center text-sm">
+          No bills match <strong>“{search}”</strong>.
+        </div>
+      )}
 
-          {/* =================================================
-              BILL LIST
-              ================================================= */}
+      {filteredBills.length > 0 && (
+        <ul className="divide-y divide-line overflow-hidden rounded-md border border-line bg-white">
+          {filteredBills.map((saved) => {
+            const bill = saved.bill || {};
+            const billItems = Array.isArray(saved.items) ? saved.items : [];
+            const totalItems = billItems.filter(
+              (item) => String(item?.desc ?? "").trim() !== "",
+            ).length;
+            const updatedAt = saved.updatedAt || saved.createdAt;
+            const meta = [
+              `${totalItems} ${totalItems === 1 ? "item" : "items"}`,
+              bill.pax ? `Pax ${bill.pax}` : null,
+              bill.user ? `User ${bill.user}` : null,
+            ].filter(Boolean);
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-            }}
-          >
-            {filteredBills.map((saved) => {
-              const bill = saved.bill || {};
-
-              const billItems = Array.isArray(saved.items) ? saved.items : [];
-
-              const totalItems = billItems.filter(
-                (item) => String(item?.desc ?? "").trim() !== "",
-              ).length;
-
-              const updatedAt = saved.updatedAt || saved.createdAt;
-
-              return (
-                <article
-                  key={saved.id}
-                  style={{
-                    background: "#fffdf8",
-                    border: "1px solid #ded5c4",
-                    borderRadius: "10px",
-                    padding: "12px",
-                    boxSizing: "border-box",
-                    boxShadow: "0 3px 10px rgba(60,50,35,0.07)",
-                    transition:
-                      "transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-1px)";
-                    e.currentTarget.style.borderColor = "#c7b58f";
-                    e.currentTarget.style.boxShadow =
-                      "0 6px 16px rgba(60,50,35,0.10)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.borderColor = "#ded5c4";
-                    e.currentTarget.style.boxShadow =
-                      "0 3px 10px rgba(60,50,35,0.07)";
-                  }}
-                >
-                  {/* Top */}
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      gap: "10px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        minWidth: 0,
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "7px",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: "13.5px",
-                            fontWeight: 700,
-                            color: "#29251f",
-                          }}
-                        >
-                          Bill #{bill.billNo || "—"}
-                        </span>
-
-                        {bill.table && (
-                          <span
-                            style={{
-                              fontSize: "10px",
-                              padding: "3px 7px",
-                              borderRadius: "10px",
-                              background: "#f0e6d1",
-                              color: "#665333",
-                            }}
-                          >
-                            Table {bill.table}
-                          </span>
-                        )}
-                      </div>
-
-                      <div
-                        style={{
-                          marginTop: "3px",
-                          color: "#665f53",
-                          fontSize: "11.5px",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        {bill.name || "Unnamed customer"}
-                      </div>
-                    </div>
-
-                    <div
-                      style={{
-                        textAlign: "right",
-                        flexShrink: 0,
-                      }}
-                    >
-                      <div
-                        style={{
-                          color: "#746a5b",
-                          fontSize: "10px",
-                        }}
-                      >
-                        {formatDate(updatedAt)}
-                      </div>
-
-                      <div
-                        style={{
-                          color: "#a09788",
-                          fontSize: "9.5px",
-                          marginTop: "2px",
-                        }}
-                      >
-                        {formatTime(updatedAt)}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Details */}
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "14px",
-                      flexWrap: "wrap",
-                      marginTop: "10px",
-                      paddingTop: "9px",
-                      borderTop: "1px solid #eee7da",
-                      color: "#7b7264",
-                      fontSize: "10.5px",
-                    }}
-                  >
-                    <span>
-                      Items{" "}
-                      <strong
-                        style={{
-                          color: "#39342c",
-                        }}
-                      >
-                        {totalItems}
-                      </strong>
+            return (
+              <li
+                key={saved.id}
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2 px-4 py-4 transition-colors duration-150 hover:bg-ivory sm:px-5 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_auto]"
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="truncate font-mono text-[14px] font-semibold">
+                      #{bill.billNo || "—"}
                     </span>
-
-                    {bill.pax && (
-                      <span>
-                        Pax{" "}
-                        <strong
-                          style={{
-                            color: "#39342c",
-                          }}
-                        >
-                          {bill.pax}
-                        </strong>
-                      </span>
-                    )}
-
-                    {bill.user && (
-                      <span>
-                        User{" "}
-                        <strong
-                          style={{
-                            color: "#39342c",
-                          }}
-                        >
-                          {bill.user}
-                        </strong>
+                    {bill.table && (
+                      <span className="rounded-sm bg-neutral-bg px-1.5 py-0.5 text-[11px] font-medium text-slate-muted">
+                        Table {bill.table}
                       </span>
                     )}
                   </div>
+                  <p className="mt-0.5 truncate text-[13px] text-slate-muted">
+                    {bill.name || "Unnamed customer"}
+                  </p>
+                </div>
 
-                  {/* Actions */}
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "7px",
-                      marginTop: "10px",
-                    }}
+                <div className="order-3 col-span-2 min-w-0 text-[13px] text-slate-muted md:order-none md:col-span-1">
+                  <p>
+                    {formatDate(updatedAt)}
+                    {formatTime(updatedAt) && (
+                      <span className="ml-2 text-xs">
+                        {formatTime(updatedAt)}
+                      </span>
+                    )}
+                  </p>
+                  <p className="mt-0.5 truncate text-xs">{meta.join(" · ")}</p>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => onOpenBill(saved)}
+                    className="inline-flex h-9 items-center gap-1.5 rounded-md border border-line bg-white px-3 text-[13px] font-medium transition-colors duration-150 hover:bg-neutral-bg focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-700/50"
                   >
-                    <button
-                      type="button"
-                      onClick={() => onOpenBill(saved)}
-                      style={{
-                        flex: 1,
-                        height: "34px",
-                        border: "1px solid #3b352c",
-                        borderRadius: "6px",
-                        background: "#2b2722",
-                        color: "#f9f3e6",
-                        fontSize: "11.5px",
-                        fontWeight: 600,
-                        cursor: "pointer",
-                      }}
-                    >
-                      ↗ Open Bill
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(saved.id)}
-                      disabled={deletingId === saved.id}
-                      aria-label={`Delete bill ${bill.billNo || ""}`}
-                      style={{
-                        width: "38px",
-                        height: "34px",
-                        border: "1px solid #dfd3c0",
-                        borderRadius: "6px",
-                        background: "#fffaf1",
-                        color: "#a3483d",
-                        fontSize: "14px",
-                        cursor: deletingId === saved.id ? "wait" : "pointer",
-                      }}
-                    >
-                      {deletingId === saved.id ? "…" : "×"}
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </>
+                    <i
+                      aria-hidden="true"
+                      className="ri-arrow-right-up-line text-[16px] leading-none"
+                    />{" "}
+                    Open
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(saved.id)}
+                    disabled={deletingId === saved.id}
+                    aria-label={`Delete bill ${bill.billNo || ""}`}
+                    title="Delete"
+                    className="flex h-9 w-9 items-center justify-center rounded-md text-slate-muted transition-colors duration-150 hover:bg-danger/10 hover:text-danger focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-700/50 disabled:opacity-45"
+                  >
+                    <i
+                      aria-hidden="true"
+                      className="ri-delete-bin-6-line text-[18px] leading-none"
+                    />
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       )}
     </section>
   );

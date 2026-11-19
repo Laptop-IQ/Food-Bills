@@ -1,32 +1,72 @@
 import {
-  FONT,
-  FONT_OPTIONS,
   DEFAULT_FONT_SIZE,
-  MIN_FONT_SIZE,
-  MAX_FONT_SIZE,
+  FONT_OPTIONS,
   FONT_STEP,
+  MAX_FONT_SIZE,
+  MIN_FONT_SIZE,
 } from "./foodBillConstants";
+
+const FOCUS =
+  "focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-700/50";
+
+const Ri = ({ name, className = "" }) => (
+  <i aria-hidden="true" className={`ri-${name} leading-none ${className}`} />
+);
+
+function EditSwitch({ editMode, onToggle, compact = false }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={editMode}
+      aria-label="Edit mode"
+      onClick={onToggle}
+      className={`inline-flex items-center gap-2.5 rounded-md border px-3 transition-colors duration-150 ${FOCUS} ${
+        compact ? "h-11" : "h-10"
+      } ${
+        editMode
+          ? "border-forest-700/30 bg-forest-50 text-forest-800"
+          : "border-line bg-white text-slate-muted hover:bg-neutral-bg"
+      }`}
+    >
+      <Ri
+        name={editMode ? "edit-2-line" : "lock-line"}
+        className="text-[18px]"
+      />
+      <span
+        className={`text-[13px] font-medium ${compact ? "hidden min-[420px]:inline" : ""}`}
+      >
+        {editMode ? "Editing" : "View only"}
+      </span>
+      <span
+        aria-hidden="true"
+        className={`relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200 ${editMode ? "bg-forest-700" : "bg-line"}`}
+      >
+        <span
+          className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+            editMode ? "translate-x-4" : "translate-x-0"
+          }`}
+        />
+      </span>
+    </button>
+  );
+}
 
 export default function FoodBillToolbar({
   onPrint,
   onAddItem,
   onReset,
-  onSaveBill, // ✅ ADDED
-
-  font = FONT,
+  onSaveBill,
+  font,
   fontSize = DEFAULT_FONT_SIZE,
   bold = false,
-
   fontOptions = FONT_OPTIONS,
-
   onFontChange,
   onFontSizeChange,
   onBoldChange,
-
   onSelectAllText,
   hasSelection = false,
   selectedField = null,
-
   editMode = true,
   onEditModeToggle,
 }) {
@@ -34,63 +74,26 @@ export default function FoodBillToolbar({
 
   const decreaseFont = () => {
     if (controlDisabled) return;
-
-    const next = Math.max(
-      MIN_FONT_SIZE,
-      Number(fontSize || DEFAULT_FONT_SIZE) - FONT_STEP,
+    onFontSizeChange?.(
+      Math.max(
+        MIN_FONT_SIZE,
+        Number(fontSize || DEFAULT_FONT_SIZE) - FONT_STEP,
+      ),
     );
-
-    onFontSizeChange?.(next);
   };
-
   const increaseFont = () => {
     if (controlDisabled) return;
-
-    const next = Math.min(
-      MAX_FONT_SIZE,
-      Number(fontSize || DEFAULT_FONT_SIZE) + FONT_STEP,
+    onFontSizeChange?.(
+      Math.min(
+        MAX_FONT_SIZE,
+        Number(fontSize || DEFAULT_FONT_SIZE) + FONT_STEP,
+      ),
     );
-
-    onFontSizeChange?.(next);
   };
 
-  const buttons = [
-    {
-      key: "edit",
-      label: editMode ? "🔓 EDIT ON" : "🔒 EDIT OFF",
-      onClick: onEditModeToggle,
-      edit: true,
-    },
-
-    {
-      key: "save",
-      label: "💾 SAVE BILL",
-
-      // ✅ THIS WAS THE MAIN PROBLEM
-      onClick: editMode ? onSaveBill : undefined,
-
-      primary: true,
-    },
-
-    {
-      key: "print",
-      label: "🖨 PRINT",
-      onClick: onPrint,
-    },
-
-    {
-      key: "add",
-      label: "＋ ADD ITEM",
-      onClick: editMode ? onAddItem : undefined,
-    },
-
-    {
-      key: "reset",
-      label: "↺ RESET",
-      onClick: editMode ? onReset : undefined,
-      danger: true,
-    },
-  ];
+  const save = editMode ? onSaveBill : undefined;
+  const add = editMode ? onAddItem : undefined;
+  const reset = editMode ? onReset : undefined;
 
   const selectionLabel = selectedField
     ? selectedField
@@ -99,327 +102,221 @@ export default function FoodBillToolbar({
         .replace(/^itemPrice:/, "Item Price ")
     : null;
 
+  const btn = `inline-flex h-10 items-center justify-center gap-2 rounded-md px-3.5 text-[13px] font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-45 ${FOCUS}`;
+  const ghost = `${btn} border border-line bg-white text-ink enabled:hover:bg-neutral-bg`;
+  const primary = `${btn} bg-forest-700 text-ivory enabled:hover:bg-forest-800`;
+  const stepBtn = `flex h-10 w-10 items-center justify-center rounded-md border border-line bg-white text-ink transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-45 enabled:hover:bg-neutral-bg ${FOCUS}`;
+
   return (
-    <div
-      className="no-print food-bill-toolbar"
-      style={{
-        width: "100%",
-        maxWidth: "520px",
-        marginBottom: "18px",
-        boxSizing: "border-box",
-        fontFamily: font || FONT,
-      }}
-    >
-      {/* =================================================
-          TOP TOOLBAR
-          ================================================= */}
-
-      <div
-        style={{
-          display: "flex",
-          gap: "6px",
-          width: "100%",
-          padding: "6px",
-          background: "linear-gradient(135deg, #29251f, #1f1c18)",
-          border: "1px solid #3e3931",
-          borderRadius: "8px",
-          boxShadow: "0 6px 18px rgba(0,0,0,0.18)",
-          boxSizing: "border-box",
-        }}
-      >
-        {buttons.map((button) => {
-          const disabled = !button.onClick;
-
-          return (
+    <>
+      <div className="no-print food-bill-toolbar space-y-4">
+        {/* Actions (desktop) */}
+        <section className="hidden rounded-md border border-line bg-white lg:block">
+          <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-4">
+            <div>
+              <h2 className="font-display text-[16px] font-semibold tracking-tight">
+                Actions
+              </h2>
+              <p className="mt-0.5 text-xs text-slate-muted">
+                Save, print or change the bill.
+              </p>
+            </div>
+            <EditSwitch editMode={editMode} onToggle={onEditModeToggle} />
+          </div>
+          <div className="space-y-2.5 p-5">
             <button
-              key={button.key}
               type="button"
-              onClick={button.onClick}
-              disabled={disabled}
-              style={{
-                flex: button.key === "edit" ? "0 0 82px" : 1,
-
-                minWidth: 0,
-                height: "38px",
-                padding: "0 5px",
-
-                fontFamily: font || FONT,
-
-                fontSize: button.key === "edit" ? "10px" : "10.5px",
-
-                fontWeight: 700,
-                letterSpacing: "0.25px",
-
-                color: button.edit
-                  ? "#211b13"
-                  : button.primary
-                    ? "#211b13"
-                    : "#f5f0e6",
-
-                background: button.edit
-                  ? editMode
-                    ? "#8fd3a8"
-                    : "#d9a86c"
-                  : button.primary
-                    ? "#d7b96f"
-                    : "#302c26",
-
-                border: button.edit
-                  ? editMode
-                    ? "1px solid #a9e3bd"
-                    : "1px solid #e6bd8a"
-                  : button.primary
-                    ? "1px solid #e2ca91"
-                    : "1px solid #4b453b",
-
-                borderRadius: "4px",
-
-                cursor: disabled ? "not-allowed" : "pointer",
-
-                opacity: disabled ? 0.42 : 1,
-
-                transition: "all 0.15s ease",
-              }}
+              onClick={save}
+              disabled={!save}
+              className={`${primary} h-11 w-full`}
             >
-              {button.label}
+              <Ri name="save-3-line" className="text-[18px]" /> Save bill
             </button>
-          );
-        })}
-      </div>
-
-      {/* =================================================
-          TEXT FORMAT TOOLBAR
-          ================================================= */}
-
-      <div
-        style={{
-          marginTop: "8px",
-          padding: "8px",
-          background: "linear-gradient(135deg, #fffdf8, #f4eee2)",
-          border: "1px solid #d8cfbf",
-          borderRadius: "8px",
-          boxShadow: "0 3px 10px rgba(60,50,35,0.07)",
-        }}
-      >
-        {/* SELECT FULL BILL */}
-
-        <button
-          type="button"
-          onClick={editMode ? onSelectAllText : undefined}
-          disabled={!editMode}
-          style={{
-            width: "100%",
-            height: "30px",
-            marginBottom: "7px",
-
-            fontFamily: font || FONT,
-            fontSize: "10.5px",
-            fontWeight: 700,
-
-            color: editMode ? "#433d34" : "#999",
-
-            background: editMode ? "#ebe3d4" : "#eeeae2",
-
-            border: "1px solid #cfc5b4",
-            borderRadius: "4px",
-
-            cursor: editMode ? "pointer" : "not-allowed",
-
-            opacity: editMode ? 1 : 0.55,
-          }}
-        >
-          ☑ Select Full Bill Text
-        </button>
-
-        {/* FORMAT CONTROLS */}
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "6px",
-            flexWrap: "wrap",
-          }}
-        >
-          {/* FONT */}
-
-          <select
-            value={font}
-            disabled={controlDisabled}
-            onChange={(event) => onFontChange?.(event.target.value)}
-            aria-label="Selected text font"
-            style={{
-              flex: "1 1 145px",
-              minWidth: "130px",
-              height: "32px",
-              padding: "0 8px",
-
-              fontFamily: font || FONT,
-              fontSize: "11px",
-
-              color: "#29251f",
-              background: "#fffdf8",
-
-              border: "1px solid #cfc5b4",
-              borderRadius: "4px",
-
-              outline: "none",
-
-              cursor: controlDisabled ? "not-allowed" : "pointer",
-
-              opacity: controlDisabled ? 0.5 : 1,
-            }}
-          >
-            {fontOptions.map((option) => (
-              <option
-                key={option.label}
-                value={option.value}
-                style={{
-                  fontFamily: option.value || FONT,
-                }}
+            <div className="grid grid-cols-3 gap-2.5">
+              <button type="button" onClick={onPrint} className={ghost}>
+                <Ri name="printer-line" className="text-[18px]" /> Print
+              </button>
+              <button
+                type="button"
+                onClick={add}
+                disabled={!add}
+                className={ghost}
               >
-                {option.label}
-              </option>
-            ))}
-          </select>
+                <Ri name="add-line" className="text-[18px]" /> Add
+              </button>
+              <button
+                type="button"
+                onClick={reset}
+                disabled={!reset}
+                className={`${ghost} enabled:hover:!bg-danger/10 enabled:hover:!text-danger`}
+              >
+                <Ri name="restart-line" className="text-[18px]" /> Reset
+              </button>
+            </div>
+          </div>
+        </section>
 
-          {/* DECREASE */}
+        {/* Text formatting */}
+        <section className="rounded-md border border-line bg-white">
+          <div className="border-b border-line px-4 py-4 sm:px-5">
+            <h2 className="font-display text-[16px] font-semibold tracking-tight">
+              Text formatting
+            </h2>
+            <p className="mt-0.5 text-xs text-slate-muted">
+              Click a field on the bill, then change its style.
+            </p>
+          </div>
+          <div className="space-y-3 p-4 sm:p-5">
+            <button
+              type="button"
+              onClick={editMode ? onSelectAllText : undefined}
+              disabled={!editMode}
+              className={`${ghost} w-full`}
+            >
+              <Ri name="checkbox-multiple-line" className="text-[18px]" />{" "}
+              Select full bill text
+            </button>
 
+            <div className="relative">
+              <select
+                value={font}
+                disabled={controlDisabled}
+                onChange={(event) => onFontChange?.(event.target.value)}
+                aria-label="Selected text font"
+                className="h-10 w-full appearance-none rounded-md border border-line bg-white pl-3 pr-9 text-sm outline-none transition-[border-color,box-shadow] duration-150 focus:border-forest-700 focus:ring-2 focus:ring-forest-700/15 disabled:cursor-not-allowed disabled:opacity-45"
+              >
+                {fontOptions.map((option) => (
+                  <option key={option.label} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <Ri
+                name="arrow-down-s-line"
+                className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[18px] text-slate-muted"
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={decreaseFont}
+                disabled={controlDisabled}
+                title="Decrease size"
+                aria-label="Decrease text size"
+                className={stepBtn}
+              >
+                <Ri name="subtract-line" className="text-[18px]" />
+              </button>
+              <span
+                className={`flex h-10 min-w-[64px] flex-1 items-center justify-center rounded-md bg-neutral-bg text-sm font-semibold tabular-nums ${controlDisabled ? "opacity-45" : ""}`}
+              >
+                {fontSize}px
+              </span>
+              <button
+                type="button"
+                onClick={increaseFont}
+                disabled={controlDisabled}
+                title="Increase size"
+                aria-label="Increase text size"
+                className={stepBtn}
+              >
+                <Ri name="add-line" className="text-[18px]" />
+              </button>
+              <button
+                type="button"
+                disabled={controlDisabled}
+                onClick={() => onBoldChange?.(!bold)}
+                aria-pressed={hasSelection && bold}
+                title="Bold"
+                aria-label="Bold"
+                className={`flex h-10 w-10 items-center justify-center rounded-md border transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-45 ${FOCUS} ${
+                  bold && hasSelection
+                    ? "border-forest-700 bg-forest-700 text-ivory"
+                    : "border-line bg-white text-ink enabled:hover:bg-neutral-bg"
+                }`}
+              >
+                <Ri name="bold" className="text-[18px]" />
+              </button>
+            </div>
+
+            <p
+              className={`flex items-start gap-2 text-xs ${
+                !editMode
+                  ? "text-warning"
+                  : hasSelection
+                    ? "text-success"
+                    : "text-slate-muted"
+              }`}
+              role="status"
+            >
+              <Ri
+                name={
+                  !editMode
+                    ? "lock-line"
+                    : hasSelection
+                      ? "checkbox-circle-line"
+                      : "cursor-line"
+                }
+                className="mt-px text-[14px]"
+              />
+              <span>
+                {!editMode
+                  ? "View mode. Turn editing on to change the bill."
+                  : hasSelection
+                    ? selectionLabel
+                      ? `${selectionLabel} selected. Formatting applies only to this field.`
+                      : "Field selected. Formatting controls are active."
+                    : "Click any bill field to select it for formatting."}
+              </span>
+            </p>
+          </div>
+        </section>
+      </div>
+
+      {/* Mobile action bar */}
+      <div className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ivory/95 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-xl items-center gap-2">
+          <EditSwitch editMode={editMode} onToggle={onEditModeToggle} compact />
           <button
             type="button"
-            onClick={decreaseFont}
-            disabled={controlDisabled}
-            title="Decrease selected field size"
-            style={{
-              width: "32px",
-              height: "32px",
-
-              border: "1px solid #cfc5b4",
-              borderRadius: "4px",
-              background: "#fffdf8",
-              color: "#39342c",
-
-              fontFamily: font || FONT,
-              fontSize: "14px",
-              fontWeight: 700,
-
-              cursor: controlDisabled ? "not-allowed" : "pointer",
-
-              opacity: controlDisabled ? 0.5 : 1,
-            }}
+            onClick={add}
+            disabled={!add}
+            aria-label="Add item"
+            title="Add item"
+            className={`${ghost} h-11 w-11 shrink-0 !px-0`}
           >
-            A−
+            <Ri name="add-line" className="text-[20px]" />
           </button>
-
-          {/* SIZE */}
-
-          <span
-            style={{
-              minWidth: "42px",
-              height: "32px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-
-              background: "#ebe3d4",
-              border: "1px solid #cfc5b4",
-              borderRadius: "4px",
-
-              fontFamily: font || FONT,
-              fontSize: "11px",
-              fontWeight: 700,
-              color: "#39342c",
-
-              opacity: editMode ? 1 : 0.5,
-            }}
-          >
-            {fontSize}px
-          </span>
-
-          {/* INCREASE */}
-
           <button
             type="button"
-            onClick={increaseFont}
-            disabled={controlDisabled}
-            title="Increase selected field size"
-            style={{
-              width: "32px",
-              height: "32px",
-
-              border: "1px solid #cfc5b4",
-              borderRadius: "4px",
-              background: "#fffdf8",
-              color: "#39342c",
-
-              fontFamily: font || FONT,
-              fontSize: "14px",
-              fontWeight: 700,
-
-              cursor: controlDisabled ? "not-allowed" : "pointer",
-
-              opacity: controlDisabled ? 0.5 : 1,
-            }}
+            onClick={reset}
+            disabled={!reset}
+            aria-label="Reset bill"
+            title="Reset"
+            className={`${ghost} h-11 w-11 shrink-0 !px-0`}
           >
-            A+
+            <Ri name="restart-line" className="text-[20px]" />
           </button>
-
-          {/* BOLD */}
-
           <button
             type="button"
-            disabled={controlDisabled}
-            onClick={() => onBoldChange?.(!bold)}
-            aria-pressed={hasSelection && bold}
-            title="Bold selected field"
-            style={{
-              width: "38px",
-              height: "32px",
-
-              fontFamily: font || FONT,
-              fontSize: "15px",
-              fontWeight: 900,
-
-              color: bold && hasSelection ? "#211b13" : "#4b453b",
-
-              background: bold && hasSelection ? "#d7b96f" : "#fffdf8",
-
-              border:
-                bold && hasSelection
-                  ? "1px solid #c09c54"
-                  : "1px solid #cfc5b4",
-
-              borderRadius: "4px",
-
-              cursor: controlDisabled ? "not-allowed" : "pointer",
-
-              opacity: controlDisabled ? 0.5 : 1,
-            }}
+            onClick={save}
+            disabled={!save}
+            className={`${primary} h-11 min-w-0 flex-1`}
           >
-            B
+            <Ri name="save-3-line" className="text-[18px]" /> Save
           </button>
-        </div>
-
-        {/* STATUS */}
-
-        <div
-          style={{
-            marginTop: "6px",
-            fontFamily: font || FONT,
-            fontSize: "10px",
-
-            color: !editMode ? "#a05a24" : hasSelection ? "#187a3d" : "#918879",
-          }}
-        >
-          {!editMode
-            ? "🔒 View Mode — turn Edit Mode ON to edit."
-            : hasSelection
-              ? selectionLabel
-                ? `✓ ${selectionLabel} selected — formatting applies only to this field.`
-                : "✓ Field selected — formatting controls are active."
-              : "Click any bill field to select it for formatting."}
+          <button
+            type="button"
+            onClick={onPrint}
+            aria-label="Print"
+            title="Print"
+            className={`${ghost} h-11 w-11 shrink-0 !px-0`}
+          >
+            <Ri name="printer-line" className="text-[20px]" />
+          </button>
         </div>
       </div>
-    </div>
+    </>
   );
 }

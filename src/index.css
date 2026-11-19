@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@import "@fontsource-variable/manrope";
+@import "@fontsource-variable/inter";
+@import "remixicon/fonts/remixicon.css";
 
 @theme {
   --color-background: #000621;
@@ -20,7 +23,7 @@
   --radius: 0.75rem;
 
   --color-highlight: #f5a623;
-  --color-surface: #1a2329;
+  --color-surface-dark: #1a2329;
 }
 
 @layer base {
@@ -45,13 +48,13 @@
 
 @layer components {
   .glass {
-    background-color: color-mix(in srgb, var(--color-surface) 50%, transparent);
+    background-color: color-mix(in srgb, var(--color-surface-dark) 50%, transparent);
     backdrop-filter: blur(16px);
     border: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
   }
 
   .glass-strong {
-    background-color: color-mix(in srgb, var(--color-surface) 80%, transparent);
+    background-color: color-mix(in srgb, var(--color-surface-dark) 80%, transparent);
     backdrop-filter: blur(24px);
     border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
   }
@@ -201,4 +204,25 @@
     box-shadow: 0 0 40px color-mix(in srgb, var(--color-primary) 35%, transparent),
       0 0 80px color-mix(in srgb, var(--color-primary) 25%, transparent);
   }
+}
+/* ---------- Shell design tokens ---------- */
+@theme {
+  --font-display: "Manrope Variable", "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-ui: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-ivory: #faf8f3;
+  --color-shell: #ffffff;
+  --color-neutral-bg: #f1f2f4;
+  --color-ink: #1c1f23;
+  --color-slate-muted: #5f6b7a;
+  --color-line: #e3e1da;
+  --color-forest-700: #1f4d3a;
+  --color-forest-800: #173b2c;
+  --color-forest-50: #eaf2ed;
+  --color-gold-500: #b8923a;
+}
+
+@theme {
+  --color-success: #2f7d4f;
+  --color-warning: #b7791f;
+  --color-danger: #b4392f;
 }

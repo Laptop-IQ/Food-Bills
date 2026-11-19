@@ -1,0 +1,52 @@
+/*
+ * Print fix: "two pages in print view"
+ *
+ * Har page ka print CSS `body * { visibility: hidden }` use karta hai.
+ * visibility:hidden elements ko hide to karta hai, par unki jagah (height) layout
+ * me bani rehti hai (sidebar, toolbars, min-h-screen wrappers, saved-bills list...).
+ * Is wajah se document 1 page se lamba ho jata hai aur extra blank page nikalta hai.
+ *
+ * Yahan hum printable element ke ilawa baaki sab ko display:none kar dete hain
+ * aur uske ancestors ko collapse kar dete hain, taaki sirf ek hi page bane.
+ *
+ * Naya printable element add karo to bas `--print-targets` wali list me add karo
+ * (CSS variables selector me use nahi ho sakte, isliye neeche selector repeat hai).
+ */
+@media print {
+  html,
+  body,
+  #root {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* 1) Jo printable nahi hai, na printable ka ancestor hai, na child — poora hata do */
+  body
+    *:not(:is(.receipt-paper, #thermalBill, .invoice-page, .receipt-page)):not(
+      :is(.receipt-paper, #thermalBill, .invoice-page, .receipt-page) *
+    ):not(:has(:is(.receipt-paper, #thermalBill, .invoice-page, .receipt-page))) {
+    display: none !important;
+  }
+
+  /* 2) Printable ke ancestors: extra height/padding/clip hata do */
+  body
+    *:has(:is(.receipt-paper, #thermalBill, .invoice-page, .receipt-page)):not(
+      :is(.receipt-paper, #thermalBill, .invoice-page, .receipt-page)
+    ) {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: visible !important;
+    transform: none !important;
+    filter: none !important;
+    background: none !important;
+  }
+}

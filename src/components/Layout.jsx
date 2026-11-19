@@ -19,26 +19,22 @@ export default function Layout() {
     try {
       localStorage.setItem(PIN_KEY, pinned ? "1" : "0");
     } catch {
-      // storage unavailable — pin just won't persist
+      // storage unavailable: pin just won't persist
     }
   }, [pinned]);
 
   const togglePinned = useCallback(() => setPinned((p) => !p), []);
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-[#0A0810]">
-      {/* Mobile drawer + desktop hover / pinned sidebar */}
+    <div className="min-h-screen w-full overflow-x-clip bg-[#0A0810]">
       <Sidebar pinned={pinned} onTogglePinned={togglePinned} />
-
-      {/* Main Content — pushed aside smoothly while the sidebar is pinned */}
+      {/* Desktop: a 64px icon rail is always visible; pinning widens it to 264px and pushes content */}
       <main
         className={[
           "min-h-screen w-full pt-14 md:pt-0",
-          "md:transition-[padding-left] md:duration-300",
-          "md:ease-[cubic-bezier(0.22,1,0.36,1)]",
-          "motion-reduce:transition-none",
-          "print:pl-0",
-          pinned ? "md:pl-[260px]" : "md:pl-0",
+          "md:transition-[padding-left] md:duration-200 md:ease-out",
+          "motion-reduce:transition-none print:pl-0",
+          pinned ? "md:pl-[264px]" : "md:pl-16",
         ].join(" ")}
       >
         <div className="relative min-h-screen w-full">

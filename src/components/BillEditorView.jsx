@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { VIEW } from "../layout/constants";
 import BillPreviewPanel from "./BillPreviewPanel";
 import TextStyleControls from "./TextStyleControls";
@@ -22,9 +22,49 @@ const EDITOR_FIELDS = [
   ["user", "User", false],
 ];
 
+function Section({ t, title, hint, action, collapsible = false, defaultOpen = true, children }) {
+  const [open, setOpen] = useState(defaultOpen);
+  const showBody = !collapsible || open;
+  const headingId = `section-${title.toLowerCase().replace(/\s+/g, "-")}`;
+  const headBody = (
+    <div className="min-w-0 text-left">
+      <h2 id={headingId} className="font-display text-[17px] font-semibold tracking-tight">{title}</h2>
+      {hint && <p className={`mt-0.5 text-xs ${t.muted}`}>{hint}</p>}
+    </div>
+  );
+  return (
+    <section className={`rounded-md border ${t.card}`}>
+      <div className={`flex items-start justify-between gap-3 ${showBody ? `border-b ${t.line.split(" ")[0]}` : ""}`}>
+        {collapsible ? (
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-controls={`${headingId}-body`}
+            className="flex min-w-0 flex-1 items-center justify-between gap-3 rounded-md px-4 py-4 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-700/50 sm:px-6"
+          >
+            {headBody}
+            <span className={`flex shrink-0 items-center gap-1.5 text-[12px] font-medium ${t.muted}`}>
+              {open ? "Hide" : "Show"}
+              <i aria-hidden="true" className={`ri-arrow-down-s-line text-[20px] leading-none transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+            </span>
+          </button>
+        ) : (
+          <div className="min-w-0 px-4 py-4 sm:px-6">{headBody}</div>
+        )}
+        {action && <div className="px-4 py-3 sm:px-6 sm:py-3.5">{action}</div>}
+      </div>
+      {showBody && (
+        <div id={`${headingId}-body`} className="px-4 py-5 sm:px-6">
+          {children}
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function BillEditorView({
-  theme,
-  darkMode,
+    darkMode,
   editingId,
   bill,
   setBill,
@@ -46,265 +86,113 @@ export default function BillEditorView({
   totals,
   onTogglePaid,
 }) {
-  const { pageBg, cardBg, cardBorder, inputBg, mutedText } = theme;
-
   const { grandTotal } = totals;
+  const ri = (name, cls = "") => <i aria-hidden="true" className={`ri-${name} leading-none ${cls}`} />;
 
-  const navBg = darkMode
-    ? "bg-[#111113]/95 border-white/10"
-    : "bg-white/95 border-slate-200";
+  const t = darkMode
+    ? {
+        page: "bg-neutral-900 text-neutral-100",
+        nav: "bg-neutral-900/95 border-neutral-700",
+        card: "bg-neutral-800 border-neutral-700",
+        line: "border-neutral-700 divide-neutral-700",
+        muted: "text-neutral-400",
+        ghost: "border-neutral-700 text-neutral-100 hover:bg-neutral-700/60",
+        input: "bg-neutral-900 border-neutral-700 text-neutral-100 placeholder:text-neutral-500",
+        soft: "bg-neutral-900/60",
+      }
+    : {
+        page: "bg-ivory text-ink",
+        nav: "bg-ivory/95 border-line",
+        card: "bg-white border-line",
+        line: "border-line divide-line",
+        muted: "text-slate-muted",
+        ghost: "border-line bg-white text-ink hover:bg-neutral-bg",
+        input: "bg-white border-line text-ink placeholder:text-slate-400",
+        soft: "bg-neutral-bg/60",
+      };
 
-  const navButton = darkMode
-    ? "bg-white/5 hover:bg-white/10 border-white/10 text-white"
-    : "bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700";
-
-  const inputClass = `
-    w-full
-    rounded-xl
-    border
-    px-3 py-2.5
-    text-sm
-    outline-none
-    transition-all
-    placeholder:text-slate-400
-    focus:border-blue-500
-    focus:ring-4
-    focus:ring-blue-500/10
-    ${inputBg}
-  `;
+  const FOCUS = "focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-700/50";
+  const btn = `inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-md px-3.5 text-[13px] font-medium transition-colors duration-150 ${FOCUS}`;
+  const label = `mb-1.5 block text-[11px] font-semibold uppercase tracking-[0.08em] ${t.muted}`;
+  const inputClass = `h-10 w-full rounded-md border px-3 text-sm outline-none transition-[border-color,box-shadow] duration-150 focus:border-forest-700 focus:ring-2 focus:ring-forest-700/15 ${t.input}`;
 
   return (
-    <div className={`min-h-screen ${pageBg}`}>
-      {/* Top Navigation */}
-      <header
-        className={`
-          sticky top-0 z-40
-          border-b backdrop-blur-xl
-          ${navBg}
-          no-print
-        `}
-      >
-        <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-3 sm:px-5">
-          <button
-            type="button"
-            onClick={() => setView(VIEW.LIST)}
-            className={`
-              rounded-xl border px-3 py-2
-              text-sm font-semibold
-              transition-all active:scale-95
-              ${navButton}
-            `}
-          >
-            <span className="inline">← Back to Edit Bills</span>
+    <div className={`min-h-screen ${t.page}`}>
+      {/* Top bar */}
+      <header className={`sticky top-14 z-40 border-b backdrop-blur md:top-0 no-print ${t.nav}`}>
+        <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-3 sm:px-6">
+          <button type="button" onClick={() => setView(VIEW.LIST)} aria-label="Back to saved bills" className={`${btn} border ${t.ghost} !px-3`}>
+            {ri("arrow-left-line", "text-[18px]")}
+            <span className="hidden sm:inline">Saved bills</span>
           </button>
 
-          <div className="min-w-0 flex-1 px-1">
+          <div className={`hidden h-6 w-px sm:block ${darkMode ? "bg-neutral-700" : "bg-line"}`} />
+
+          <div className="hidden flex-1 max-[379px]:block" />
+
+          <div className="min-w-0 flex-1 max-[379px]:hidden">
             <div className="flex items-center gap-2">
-              <span
-                className={`
-                  rounded-md px-1.5 py-0.5
-                  text-[9px] font-black tracking-wider
-                  ${
-                    editingId
-                      ? "bg-amber-100 text-amber-700"
-                      : "bg-blue-100 text-blue-700"
-                  }
-                `}
-              >
-                {editingId ? "EDIT" : "NEW"}
-              </span>
-          
+              
             </div>
           </div>
 
-          <div
-            className="
-              hidden rounded-xl
-              border border-emerald-200
-              bg-emerald-50
-              px-3 py-2
-              text-sm font-black
-              text-emerald-700
-              sm:block
-            "
-          >
-            ₹{grandTotal.toFixed(0)}
+          <div className={`hidden h-6 w-px sm:block ${darkMode ? "bg-neutral-700" : "bg-line"}`} />
+
+          <div className="flex items-center gap-8">
+            <button type="button" onClick={onSaveTemplate} aria-label="Save as template" title="Save as template" className={`${btn} border ${t.ghost} !px-5`}>
+              {ri("bookmark-3-line", "text-[18px]")}
+              <span className="hidden xl:inline">Template</span>
+            </button>
+            <button type="button" onClick={onSave} aria-label="Save bill" title="Save bill" className={`${btn} border ${t.ghost} !px-5`}>
+              {ri("save-3-line", "text-[18px]")}
+              <span className="hidden md:inline">Save</span>
+            </button>
+            <button type="button" onClick={() => setView(VIEW.PREVIEW)} aria-label="Preview and print" className={`${btn} bg-forest-700 text-ivory hover:bg-forest-800`}>
+              {ri("eye-line", "text-[18px]")}
+              <span className="hidden sm:inline">Preview</span>
+            </button>
           </div>
-
-          <button
-            type="button"
-            onClick={onSave}
-            className="
-              rounded-xl
-              bg-emerald-600
-              px-3.5 py-2
-              text-sm font-bold
-              text-white
-              shadow-sm
-              transition-all
-              hover:bg-emerald-700
-              active:scale-95
-              sm:px-4
-            "
-          >
-            💾 <span className="hidden sm:inline">Save</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={onSaveTemplate}
-            className="
-              rounded-xl
-              border border-violet-200
-              bg-violet-50
-              px-3.5 py-2
-              text-sm font-bold
-              text-violet-700
-              shadow-sm
-              transition-all
-              hover:bg-violet-100
-              active:scale-95
-              sm:px-4
-            "
-          >
-            📑 <span className="hidden sm:inline">Save Template</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setView(VIEW.PREVIEW)}
-            className="
-              rounded-xl
-              bg-blue-600
-              px-3.5 py-2
-              text-sm font-bold
-              text-white
-              shadow-sm
-              transition-all
-              hover:bg-blue-700
-              active:scale-95
-              sm:px-4
-            "
-          >
-            🖨️
-            <span className="hidden sm:inline ml-1">Preview</span>
-          </button>
         </div>
-
         {storageStatus && (
-          <div className="mx-auto max-w-7xl px-4 pb-2">
-            <p className="text-[10px] font-semibold text-emerald-600">
-              {storageStatus}
-            </p>
-          </div>
+          <p role="status" className="mx-auto max-w-7xl px-4 pb-2 text-[11px] font-medium text-success sm:px-6">
+            {storageStatus}
+          </p>
         )}
       </header>
 
-      {/* Main */}
-      <main className="mx-auto max-w-7xl px-3 py-4 sm:px-5 sm:py-6">
-        <div className="grid gap-5 lg:grid-cols-[1.05fr_.95fr]">
-          {/* Editor Card */}
-          <section
-            className={`
-              rounded-2xl
-              border
-              ${cardBorder}
-              ${cardBg}
-              p-4
-              shadow-sm
-              sm:p-5
-            `}
-          >
-            <div className="mb-5 flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold sm:text-xl">Bill Details</h2>
-
-                <p className={`mt-1 text-xs ${mutedText}`}>
-                  Enter restaurant and billing information.
-                </p>
+      <main className="mx-auto w-full max-w-7xl px-3 py-2 sm:px-6 sm:py-8">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
+          {/* Form column */}
+          <div className="min-w-0 space-y-5">
+            <Section t={t} title="Bill details" hint="Restaurant and billing information.">
+              <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+                {EDITOR_FIELDS.map(([field, placeholder, fullWidth]) => {
+                  const Wrapper = field === "date" ? "div" : "label";
+                  return (
+                    <Wrapper key={field} className={fullWidth ? "sm:col-span-2" : ""}>
+                      <span className={label}>{placeholder}</span>
+                      {field === "date" ? (
+                        <DateTimePicker
+                          value={bill.date ?? ""}
+                          darkMode={darkMode}
+                          inputClass={inputClass}
+                          onChange={(date) => setBill({ ...bill, date })}
+                        />
+                      ) : (
+                        <input
+                          className={inputClass}
+                          value={bill[field] ?? ""}
+                          placeholder={placeholder}
+                          onChange={(e) => setBill({ ...bill, [field]: e.target.value })}
+                        />
+                      )}
+                    </Wrapper>
+                  );
+                })}
               </div>
+            </Section>
 
-              <div
-                className={`
-                  flex h-9 w-9 items-center justify-center
-                  rounded-xl
-                  ${
-                    darkMode
-                      ? "bg-blue-500/10 text-blue-400"
-                      : "bg-blue-50 text-blue-600"
-                  }
-                `}
-              >
-                🧾
-              </div>
-            </div>
-
-            {/* Fields */}
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {EDITOR_FIELDS.map(([field, placeholder, fullWidth]) => {
-                const Wrapper = field === "date" ? "div" : "label";
-                return (
-                <Wrapper
-                  key={field}
-                  className={fullWidth ? "sm:col-span-2" : ""}
-                >
-                  <span
-                    className={`
-                        mb-1.5 block
-                        text-[10px]
-                        font-bold
-                        uppercase
-                        tracking-wide
-                        ${mutedText}
-                      `}
-                  >
-                    {placeholder}
-                  </span>
-
-                  {field === "date" ? (
-                    <DateTimePicker
-                      value={bill.date ?? ""}
-                      darkMode={darkMode}
-                      inputClass={inputClass}
-                      onChange={(date) => setBill({ ...bill, date })}
-                    />
-                  ) : (
-                    <input
-                      className={inputClass}
-                      value={bill[field] ?? ""}
-                      placeholder={placeholder}
-                      onChange={(e) =>
-                        setBill({
-                          ...bill,
-                          [field]: e.target.value,
-                        })
-                      }
-                    />
-                  )}
-                </Wrapper>
-                );
-              })}
-            </div>
-
-            {/* Text styling */}
-            <div
-              className={`
-                mt-6
-                rounded-2xl
-                border
-                ${cardBorder}
-                p-4
-                ${darkMode ? "bg-white/[0.02]" : "bg-slate-50/70"}
-              `}
-            >
-              <div className="mb-4">
-                <h2 className="text-base font-bold">Text Formatting</h2>
-                <p className={`mt-1 text-xs ${mutedText}`}>
-                  GST Number, font size, bold and text spacing can be changed here.
-                  Changes apply instantly to preview and print/PDF.
-                </p>
-              </div>
-
+            <Section t={t} title="Text formatting" hint="Size, weight and spacing apply instantly to the preview and print/PDF." collapsible defaultOpen={false}>
               <TextStyleControls
                 textStyles={textStyles}
                 selectedField={selectedTextField}
@@ -314,221 +202,108 @@ export default function BillEditorView({
                 onResetAll={onTextStylesResetAll}
                 baseFontSize={fontControlProps?.fontSize || 12}
               />
-            </div>
+            </Section>
 
-            {/* Items */}
-            <div className="mt-8">
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <h2 className="text-lg font-bold">Items</h2>
-
-                  <p className={`text-xs ${mutedText}`}>
-                    Add products/services to this bill.
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={addItem}
-                  className="
-                    rounded-xl
-                    bg-slate-900
-                    px-3 py-2
-                    text-xs font-bold
-                    text-white
-                    transition-all
-                    hover:bg-slate-700
-                    active:scale-95
-                  "
-                >
-                  + Add Item
+            <Section
+              t={t}
+              title="Items"
+              hint="Products and services on this bill."
+              action={
+                <button type="button" onClick={addItem} className={`${btn} bg-ink text-ivory hover:bg-ink/85 ${darkMode ? "!bg-neutral-100 !text-neutral-900" : ""}`}>
+                  {ri("add-line", "text-[18px]")} Add item
                 </button>
-              </div>
-
-              {/* Desktop header */}
-              <div
-                className={`
-                  mb-2 hidden
-                  grid-cols-12 gap-2
-                  px-1
-                  text-[9px]
-                  font-black
-                  uppercase
-                  tracking-wider
-                  ${mutedText}
-                  sm:grid
-                `}
-              >
-                <div className="col-span-5">Item</div>
-                <div className="col-span-2 text-center">Qty</div>
-                <div className="col-span-2 text-center">Rate</div>
-                <div className="col-span-2 text-right">Amount</div>
-                <div />
-              </div>
-
-              <div className="space-y-3">
-                {items.map((item, index) => (
-                  <div
-                    key={item.id}
-                    className={`
-                      rounded-2xl
-                      border
-                      ${cardBorder}
-                      p-3
-                      transition-all
-                    `}
-                  >
-                    <div className="mb-2 flex items-center justify-between">
-                      <span
-                        className={`
-                          rounded-md px-2 py-1
-                          text-[9px] font-bold
-                          ${
-                            darkMode
-                              ? "bg-white/5 text-neutral-400"
-                              : "bg-slate-100 text-slate-500"
-                          }
-                        `}
-                      >
-                        ITEM #{index + 1}
-                      </span>
-
-                      <button
-                        type="button"
-                        onClick={() => deleteItem(index)}
-                        className="
-                          flex h-7 w-7
-                          items-center justify-center
-                          rounded-lg
-                          bg-red-50
-                          text-red-500
-                          transition-all
-                          hover:bg-red-100
-                          active:scale-95
-                        "
-                        title="Remove item"
-                      >
-                        ×
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                      <input
-                        className={`col-span-2 ${inputClass}`}
-                        value={item.name ?? ""}
-                        placeholder="Item name"
-                        onChange={(e) =>
-                          updateItem(index, "name", e.target.value)
-                        }
-                      />
-
-                      <input
-                        type="number"
-                        min="0"
-                        className={inputClass}
-                        value={item.qty}
-                        placeholder="Qty"
-                        onChange={(e) =>
-                          updateItem(index, "qty", e.target.value)
-                        }
-                      />
-
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        className={inputClass}
-                        value={item.rate}
-                        placeholder="Rate"
-                        onChange={(e) =>
-                          updateItem(index, "rate", e.target.value)
-                        }
-                      />
-                    </div>
-
-                    <div
-                      className={`
-                        mt-2
-                        flex items-center justify-between
-                        rounded-xl
-                        px-3 py-2
-                        text-xs
-                        ${darkMode ? "bg-white/5" : "bg-slate-50"}
-                      `}
-                    >
-                      <span className={mutedText}>Amount</span>
-
-                      <strong className="text-emerald-600">
-                        ₹
-                        {(
-                          Number(item.qty || 0) * Number(item.rate || 0)
-                        ).toFixed(2)}
-                      </strong>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Payment */}
-            <div
-              className={`
-                mt-6
-                flex flex-col gap-3
-                border-t
-                ${cardBorder}
-                pt-5
-                sm:flex-row sm:items-center sm:justify-between
-              `}
+              }
             >
+              {items.length === 0 ? (
+                <div className={`rounded-md border border-dashed px-4 py-10 text-center ${t.line.split(" ")[0]}`}>
+                  <p className="text-sm font-medium">No items yet</p>
+                  <p className={`mt-1 text-xs ${t.muted}`}>Use “Add item” to start the bill.</p>
+                </div>
+              ) : (
+                <div>
+                  <div className={`hidden grid-cols-[minmax(0,1fr)_88px_112px_112px_40px] gap-3 px-1 pb-2 text-[11px] font-semibold uppercase tracking-[0.08em] md:grid ${t.muted}`} aria-hidden="true">
+                    <span>Item</span>
+                    <span>Qty</span>
+                    <span>Rate</span>
+                    <span className="text-right">Amount</span>
+                    <span />
+                  </div>
+
+                  <ul className={`divide-y ${t.line.split(" ")[1]}`}>
+                    {items.map((item, index) => (
+                      <li key={item.id} className="grid grid-cols-2 items-center gap-2.5 py-3.5 first:pt-1 md:grid-cols-[minmax(0,1fr)_88px_112px_112px_40px] md:gap-3 md:py-3">
+                        <input
+                          className={`${inputClass} col-span-2 md:col-span-1`}
+                          value={item.name ?? ""}
+                          placeholder={`Item ${index + 1} name`}
+                          aria-label={`Item ${index + 1} name`}
+                          onChange={(e) => updateItem(index, "name", e.target.value)}
+                        />
+                        <input
+                          type="number"
+                          min="0"
+                          inputMode="decimal"
+                          className={`${inputClass} tabular-nums`}
+                          value={item.qty}
+                          placeholder="Qty"
+                          aria-label={`Item ${index + 1} quantity`}
+                          onChange={(e) => updateItem(index, "qty", e.target.value)}
+                        />
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          inputMode="decimal"
+                          className={`${inputClass} tabular-nums`}
+                          value={item.rate}
+                          placeholder="Rate"
+                          aria-label={`Item ${index + 1} rate`}
+                          onChange={(e) => updateItem(index, "rate", e.target.value)}
+                        />
+                        <div className={`flex h-10 items-center justify-between rounded-md px-3 text-sm md:justify-end md:bg-transparent md:px-0 ${t.soft}`}>
+                          <span className={`text-xs md:hidden ${t.muted}`}>Amount</span>
+                          <strong className="font-semibold tabular-nums">₹{(Number(item.qty || 0) * Number(item.rate || 0)).toFixed(2)}</strong>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => deleteItem(index)}
+                          title="Remove item"
+                          aria-label={`Remove item ${index + 1}`}
+                          className={`flex h-10 w-full items-center justify-center rounded-md transition-colors duration-150 ${FOCUS} ${t.muted} hover:bg-danger/10 hover:text-danger md:h-9 md:w-9`}
+                        >
+                          {ri("delete-bin-6-line", "text-[18px]")}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </Section>
+
+            {/* Payment + total */}
+            <section className={`flex flex-col gap-4 rounded-md border px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 ${t.card}`}>
               <button
                 type="button"
                 onClick={onTogglePaid}
-                className={`
-                  flex items-center gap-3
-                  rounded-xl
-                  border
-                  px-3 py-2.5
-                  text-sm font-bold
-                  transition-all
-                  ${
-                    bill.paid
-                      ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                      : `${cardBorder} ${mutedText}`
-                  }
-                `}
+                aria-pressed={Boolean(bill.paid)}
+                className={`${btn} h-11 justify-start border ${
+                  bill.paid ? "border-success/30 bg-success/10 text-success" : `${darkMode ? "border-neutral-700" : "border-line"} ${t.muted} hover:bg-neutral-bg/60`
+                }`}
               >
-                <span
-                  className={`
-                    flex h-5 w-5 items-center justify-center
-                    rounded-md border text-xs
-                    ${
-                      bill.paid
-                        ? "border-emerald-500 bg-emerald-500 text-white"
-                        : "border-slate-300"
-                    }
-                  `}
-                >
-                  {bill.paid ? "✓" : ""}
-                </span>
-
-                {bill.paid ? "Payment Received" : "Mark as Paid"}
+                {ri(bill.paid ? "checkbox-circle-fill" : "checkbox-blank-circle-line", "text-[19px]")}
+                {bill.paid ? "Payment received" : "Mark as paid"}
               </button>
-
-              <div className="text-right">
-                <p className={`text-[10px] ${mutedText}`}>Grand Total</p>
-
-                <p className="text-xl font-black text-emerald-600">
-                  ₹{grandTotal.toFixed(2)}
-                </p>
+              <div className="flex items-baseline justify-between gap-4 sm:block sm:text-right">
+                <p className={`text-[11px] font-medium uppercase tracking-[0.12em] ${t.muted}`}>Grand total</p>
+                <p className="font-display text-[28px] font-semibold leading-none tabular-nums">₹{grandTotal.toFixed(2)}</p>
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
 
-          {/* Preview */}
-          <div className="lg:sticky lg:top-20 lg:self-start">
+          {/* Live preview: stays in view while the form scrolls */}
+          <div className="mx-auto w-full max-w-[400px] lg:mx-0 lg:max-w-none lg:sticky lg:top-[88px] lg:flex lg:max-h-[calc(100dvh-104px)] lg:flex-col lg:self-start">
             <BillPreviewPanel
-              mutedText={mutedText}
+              mutedText={t.muted}
               fontControlProps={fontControlProps}
               textStyles={textStyles}
               bill={bill}

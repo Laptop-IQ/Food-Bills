@@ -77,9 +77,9 @@ export default function FoodBill() {
   // Preview-only paper variation. Print CSS resets this to a clean centered receipt.
   const [receiptPlacement] = useState(() => ({
     // Subtle random print placement; kept within the paper bounds.
-    x: Math.round((Math.random() * 16) - 8),
-    y: Math.round((Math.random() * 10) - 5),
-    rotate: Number(((Math.random() * 1.2) - 0.6).toFixed(2)),
+    x: Math.round(Math.random() * 16 - 8),
+    y: Math.round(Math.random() * 10 - 5),
+    rotate: Number((Math.random() * 1.2 - 0.6).toFixed(2)),
   }));
 
   /* =====================================================
@@ -426,6 +426,7 @@ export default function FoodBill() {
     setSavedBillId(saved.id ?? null);
 
     setEditMode(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
     setSaveMessage("Saved bill opened.");
 
@@ -475,163 +476,139 @@ export default function FoodBill() {
      RENDER
      ===================================================== */
 
+  const saveOk =
+    saveMessage.includes("successfully") ||
+    saveMessage === "Saved bill opened.";
+
   return (
-    <div
-      className="food-bill-page"
-      style={{
-        fontFamily: FONT,
-        minHeight: "100vh",
-        background: "#ccc5b5",
-        padding: "20px 16px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        boxSizing: "border-box",
-      }}
-    >
-      {/* TOOLBAR */}
+    <div className="food-bill-page min-h-screen bg-ivory font-sans text-ink">
+      <div className="mx-auto w-full max-w-[936px] px-4 pb-28 pt-6 sm:px-8 sm:pt-10 lg:pb-12">
+        {/* Page header */}
+        <header className="no-print mb-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gold-500">
+            Food bill
+          </p>
+          <h1 className="mt-1.5 font-display text-[28px] font-semibold leading-tight tracking-tight sm:text-[32px]">
+            Bill editor
+          </h1>
+          <p className="mt-1 text-sm text-slate-muted">
+            Edit the receipt directly, then save or print it. Totals calculate
+            automatically.
+          </p>
+        </header>
 
-      <FoodBillToolbar
-        onPrint={handlePrint}
-        onAddItem={addItem}
-        onReset={reset}
-        onSaveBill={handleSaveBill}
-        font={font}
-        fontSize={fontSize}
-        bold={bold}
-        fontOptions={FONT_OPTIONS}
-        onFontChange={handleFontChange}
-        onFontSizeChange={handleFontSizeChange}
-        onBoldChange={handleBoldChange}
-        onSelectAllText={handleSelectAllText}
-        hasSelection={hasSelection}
-        selectedField={selectedField}
-        editMode={editMode}
-        onEditModeToggle={() => setEditMode((previous) => !previous)}
-      />
-
-      {/* SAVE STATUS */}
-
-      {saveMessage && (
-        <div
-          className="no-print"
-          role="status"
-          aria-live="polite"
-          style={{
-            width: "100%",
-            maxWidth: "520px",
-            marginBottom: "8px",
-            padding: "8px 12px",
-            boxSizing: "border-box",
-            borderRadius: "7px",
-            background: saveMessage.includes("successfully")
-              ? "#edf8f1"
-              : "#fff5e9",
-            border:
-              "1px solid " +
-              (saveMessage.includes("successfully") ? "#b8dec5" : "#ead0a9"),
-            color: saveMessage.includes("successfully") ? "#187a3d" : "#9a5b1d",
-            fontSize: "11px",
-            textAlign: "center",
-          }}
-        >
-          {saveMessage}
-        </div>
-      )}
-
-      {/* RECEIPT */}
-
-      <div
-        className="receipt-paper"
-        style={{
-          background: "#fffef8",
-          color: "#000",
-          width: "100%",
-          maxWidth: "400px",
-          height: "auto",
-          minHeight: 0,
-          maxHeight: "none",
-          padding: "26px 30px 34px",
-          boxShadow:
-            "0 18px 38px rgba(15,23,42,0.20), " +
-            "0 5px 12px rgba(15,23,42,0.12)",
-          "--receipt-transform": `translate(${receiptPlacement.x}px, ${receiptPlacement.y}px) rotate(${receiptPlacement.rotate}deg)`,
-          transform: `translate(${receiptPlacement.x}px, ${receiptPlacement.y}px) rotate(${receiptPlacement.rotate}deg)`,
-          boxSizing: "border-box",
-
-          /*
-           * These styles are applied to the
-           * complete bill when "Select Full
-           * Bill Text" is active.
-           */
-          ...(selectedField === "fullBill"
-            ? {
-                fontFamily: font,
-                fontSize: `${fontSize}px`,
-                fontWeight: bold ? 700 : 400,
-              }
-            : {}),
-        }}
-      >
-        <ReceiptHeader bill={bill} onChange={set} />
-
-        {/* ITEMS */}
-
-        {hasItems && (
-          <>
-            <Hr />
-
-            <ItemsTable
-              items={items}
-              onItemChange={setItem}
-              onRemoveItem={removeItem}
-              onAddItem={addItem}
+        {/* Save status */}
+        {saveMessage && (
+          <div
+            className={`no-print mb-4 flex items-center gap-2 rounded-md border px-4 py-2.5 text-[13px] font-medium ${
+              saveOk
+                ? "border-success/25 bg-success/10 text-success"
+                : "border-warning/30 bg-warning/10 text-warning"
+            }`}
+            role="status"
+            aria-live="polite"
+          >
+            <i
+              aria-hidden="true"
+              className={`${saveOk ? "ri-checkbox-circle-line" : "ri-information-line"} text-[18px] leading-none`}
             />
-          </>
+            {saveMessage}
+          </div>
         )}
 
-        {/* TOTALS */}
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,460px)_minmax(0,380px)] lg:gap-8">
+          {/* RECEIPT */}
+          <div className="order-1 min-w-0 lg:col-start-1 lg:row-start-1">
+            <div className="rounded-md border border-line bg-neutral-bg p-3 sm:p-6">
+              <div
+                className="receipt-paper mx-auto"
+                style={{
+                  fontFamily: FONT,
+                  background: "#fffef8",
+                  color: "#000",
+                  width: "100%",
+                  maxWidth: "400px",
+                  height: "auto",
+                  minHeight: 0,
+                  maxHeight: "none",
+                  padding: "26px 30px 34px",
+                  boxShadow:
+                    "0 18px 38px rgba(15,23,42,0.20), 0 5px 12px rgba(15,23,42,0.12)",
+                  "--receipt-transform": `translate(${receiptPlacement.x}px, ${receiptPlacement.y}px) rotate(${receiptPlacement.rotate}deg)`,
+                  transform: `translate(${receiptPlacement.x}px, ${receiptPlacement.y}px) rotate(${receiptPlacement.rotate}deg)`,
+                  boxSizing: "border-box",
+                  /* Applied to the complete bill when "Select full bill text" is active. */
+                  ...(selectedField === "fullBill"
+                    ? {
+                        fontFamily: font,
+                        fontSize: `${fontSize}px`,
+                        fontWeight: bold ? 700 : 400,
+                      }
+                    : {}),
+                }}
+              >
+                <ReceiptHeader bill={bill} onChange={set} />
 
-        <TotalsSection
-          bill={bill}
-          onChange={set}
-          subTotal={subTotal}
-          cgstAmt={cgstAmt}
-          sgstAmt={sgstAmt}
-          payable={payable}
-          paid={paid}
-          balance={balance}
-          hasSubtotal={hasSubtotal}
-          hasTax={hasTax}
-          hasCgst={hasCgst}
-          hasSgst={hasSgst}
-          hasPayable={hasPayable}
-          hasPayment={hasPayment}
-          hasBalance={hasBalance}
-          gstApplicable={gstApplicable}
-        />
+                {hasItems && (
+                  <>
+                    <Hr />
+                    <ItemsTable
+                      items={items}
+                      onItemChange={setItem}
+                      onRemoveItem={removeItem}
+                      onAddItem={addItem}
+                    />
+                  </>
+                )}
+
+                <TotalsSection
+                  bill={bill}
+                  onChange={set}
+                  subTotal={subTotal}
+                  cgstAmt={cgstAmt}
+                  sgstAmt={sgstAmt}
+                  payable={payable}
+                  paid={paid}
+                  balance={balance}
+                  hasSubtotal={hasSubtotal}
+                  hasTax={hasTax}
+                  hasCgst={hasCgst}
+                  hasSgst={hasSgst}
+                  hasPayable={hasPayable}
+                  hasPayment={hasPayment}
+                  hasBalance={hasBalance}
+                  gstApplicable={gstApplicable}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* TOOLS */}
+          <div className="order-2 min-w-0 lg:col-start-2 lg:row-start-1 lg:sticky lg:top-6 lg:self-start">
+            <FoodBillToolbar
+              onPrint={handlePrint}
+              onAddItem={addItem}
+              onReset={reset}
+              onSaveBill={handleSaveBill}
+              font={font}
+              fontSize={fontSize}
+              bold={bold}
+              fontOptions={FONT_OPTIONS}
+              onFontChange={handleFontChange}
+              onFontSizeChange={handleFontSizeChange}
+              onBoldChange={handleBoldChange}
+              onSelectAllText={handleSelectAllText}
+              hasSelection={hasSelection}
+              selectedField={selectedField}
+              editMode={editMode}
+              onEditModeToggle={() => setEditMode((previous) => !previous)}
+            />
+          </div>
+        </div>
+
+        {/* SAVED BILLS */}
+        <SavedBillsList onOpenBill={handleOpenBill} onNewBill={handleNewBill} />
       </div>
-
-      {/* SAVED BILLS */}
-
-      <SavedBillsList onOpenBill={handleOpenBill} onNewBill={handleNewBill} />
-
-      {/* FOOTER */}
-
-      <p
-        className="no-print"
-        style={{
-          color: "#999",
-          fontSize: "11px",
-          marginTop: "12px",
-          textAlign: "center",
-          letterSpacing: "0.2px",
-        }}
-      >
-        {editMode ? "Edit Mode ON" : "View Mode"}
-        &nbsp; · &nbsp; Totals auto-calculate &nbsp; · &nbsp; 🖨 Print hides
-        edit controls
-      </p>
     </div>
   );
 }

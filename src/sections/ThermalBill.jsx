@@ -136,13 +136,6 @@ export default function ThermalBill() {
       }
     } catch (error) {
       console.error("Billing state load failed:", error);
-
-      showToast({
-        type: "error",
-        title: "Loading failed",
-        message: "Saved billing data could not be loaded.",
-        duration: 4500,
-      });
     } finally {
       setLoading(false);
     }
@@ -175,14 +168,6 @@ export default function ThermalBill() {
 
         if (!result.ok) {
           setStorageStatus(`⚠️ ${result.error || "Storage error"}`);
-
-          showToast({
-            type: "error",
-            title: "Storage error",
-            message: result.error || "Bill could not be saved.",
-            duration: 4500,
-          });
-
           return false;
         }
 
@@ -193,14 +178,6 @@ export default function ThermalBill() {
         console.error("Storage failed:", error);
 
         setStorageStatus("⚠️ Unable to save data.");
-
-        showToast({
-          type: "error",
-          title: "Storage error",
-          message: "Unable to save billing data.",
-          duration: 4500,
-        });
-
         return false;
       }
     },
@@ -226,13 +203,6 @@ export default function ThermalBill() {
   const resetFontPrefs = useCallback(() => {
     updateFontFamily("mono");
     updateFontSize(FONT_SIZE_DEFAULT);
-
-    showToast({
-      type: "info",
-      title: "Font reset",
-      message: "Receipt font settings restored to default.",
-      duration: 2200,
-    });
   }, [showToast, updateFontFamily, updateFontSize]);
 
   const activeFontCss =
@@ -247,13 +217,6 @@ export default function ThermalBill() {
 
     setDarkMode(next);
     saveDarkMode(next);
-
-    showToast({
-      type: "info",
-      title: next ? "Dark mode enabled" : "Light mode enabled",
-      message: "Appearance preference updated.",
-      duration: 1800,
-    });
   }, [darkMode, showToast]);
 
   const theme = getThemeClasses(darkMode);
@@ -320,25 +283,11 @@ export default function ThermalBill() {
         rate: 0,
       },
     ]);
-
-    showToast({
-      type: "info",
-      title: "Item added",
-      message: "New item row added to the bill.",
-      duration: 1500,
-    });
   }, [showToast]);
 
   const deleteItem = useCallback(
     (index) => {
       setItems((prev) => prev.filter((_, i) => i !== index));
-
-      showToast({
-        type: "info",
-        title: "Item removed",
-        message: "The item was removed from this bill.",
-        duration: 1600,
-      });
     },
     [showToast],
   );
@@ -350,16 +299,6 @@ export default function ThermalBill() {
   const togglePaid = useCallback(() => {
     setBill((prev) => {
       const nextPaid = !prev.paid;
-
-      showToast({
-        type: nextPaid ? "success" : "info",
-        title: nextPaid ? "Bill marked as paid" : "Payment status reset",
-        message: nextPaid
-          ? "This bill is now marked as paid."
-          : "This bill is no longer marked as paid.",
-        duration: 1800,
-      });
-
       return {
         ...prev,
         paid: nextPaid,
@@ -392,13 +331,6 @@ export default function ThermalBill() {
     setTemplateName("");
     setStorageStatus("");
     setView(VIEW.EDITOR);
-
-    showToast({
-      type: "info",
-      title: "New bill",
-      message: "A fresh bill is ready to fill.",
-      duration: 2000,
-    });
   }, [lastSerial, showToast]);
 
   /* ─────────────────────────────────────────────
@@ -473,14 +405,6 @@ export default function ThermalBill() {
 
     setSavedBills(updatedBills);
     setStorageStatus("");
-
-    showToast({
-      type: "success",
-      title: "Bill saved",
-      message: `Bill ${bill.billNo || ""} has been saved successfully.`,
-      duration: 2500,
-    });
-
     return true;
   }, [
     editingId,
@@ -504,22 +428,8 @@ export default function ThermalBill() {
     const saved = await saveBill();
 
     if (!saved) {
-      showToast({
-        type: "error",
-        title: "Print cancelled",
-        message: "Please save the bill successfully before printing.",
-        duration: 3500,
-      });
-
       return;
     }
-
-    showToast({
-      type: "info",
-      title: "Opening print dialog",
-      message: "Your browser print window is being prepared.",
-      duration: 1800,
-    });
 
     // Give React a moment to finish the save/UI update.
     setTimeout(() => {
@@ -527,13 +437,6 @@ export default function ThermalBill() {
         window.print();
       } catch (error) {
         console.error("Print failed:", error);
-
-        showToast({
-          type: "error",
-          title: "Print failed",
-          message: "Unable to open the browser print dialog.",
-          duration: 4500,
-        });
       }
     }, 150);
   }, [saveBill, showToast]);
@@ -575,13 +478,6 @@ export default function ThermalBill() {
     }
 
     setDeleteTarget(null);
-
-    showToast({
-      type: "success",
-      title: "Bill deleted",
-      message: "The saved bill was permanently removed.",
-      duration: 2500,
-    });
   }, [
     deleteTarget,
     savedBills,
@@ -627,12 +523,6 @@ export default function ThermalBill() {
   const handleTemplateSaved = useCallback((savedTemplate) => {
     setTemplateEditingId(savedTemplate?.id || null);
     setTemplateName(savedTemplate?.name || "");
-    showToast({
-      type: "success",
-      title: "Template saved",
-      message: `${savedTemplate?.name || "Template"} is ready to reuse.`,
-      duration: 2400,
-    });
   }, [showToast]);
 
   const handleLoadTemplate = useCallback((template) => {
@@ -660,13 +550,6 @@ export default function ThermalBill() {
     setStorageStatus("");
     setTemplateManagerOpen(false);
     setView(VIEW.EDITOR);
-
-    showToast({
-      type: "success",
-      title: "Template loaded",
-      message: `${template.name} loaded into a new bill.`,
-      duration: 2200,
-    });
   }, [lastSerial, showToast]);
 
   /* ─────────────────────────────────────────────

@@ -12,7 +12,7 @@ import BillDashboard from "./pages/BillDashboard";
 
 function PortfolioPage() {
   return (
-    <div className="min-h-screen overflow-x-hidden">
+    <div className="min-h-screen overflow-x-clip">
       <ThermalBill />
     </div>
   );

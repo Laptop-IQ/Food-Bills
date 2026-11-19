@@ -22,41 +22,29 @@ export default function BillPreviewPanel({
   receiptPlacement = null,
 }) {
   return (
-    <div className="w-full">
-      {/* =====================================================
-          LIVE PREVIEW
-          NO SETTINGS / FONT CONTROLS HERE
-      ====================================================== */}
-      <p
-        className={`mb-3 text-center text-sm font-semibold tracking-wide ${mutedText}`}
-      >
-        ── Live Preview ──
-      </p>
-
-      {/* =====================================================
-          BILL RECEIPT
-          PRINT VIEW — UNCHANGED
-      ====================================================== */}
-      <div className="flex justify-center">
-        <BillReceipt
-          bill={bill}
-          items={items}
-          activeFontCss={fontControlProps?.activeFontCss}
-          fontSize={fontControlProps?.fontSize}
-          textStyles={textStyles}
-          totals={totals}
-          showActions={showActions}
-          onPrintAndSave={onPrintAndSave}
-          onSaveOnly={onSaveOnly}
-          storageStatus={storageStatus}
-
-          showPoweredBy={showPoweredBy}
-          showGstLines={showGstLines}
-          showDividerLines={showDividerLines}
-          addressFontSize={addressFontSize}
-          footerMessage={footerMessage}
-          receiptPlacement={receiptPlacement}
-        />
+    <div className="flex min-h-0 w-full flex-col">
+      {/* Receipt stage: scrolls on its own when the receipt is taller than the screen */}
+      <div className="min-h-0 overflow-auto overscroll-contain rounded-md border border-line bg-neutral-bg sm:p-5">
+        <div className="mx-auto w-fit max-w-full">
+          <BillReceipt
+            bill={bill}
+            items={items}
+            activeFontCss={fontControlProps?.activeFontCss}
+            fontSize={fontControlProps?.fontSize}
+            textStyles={textStyles}
+            totals={totals}
+            showActions={showActions}
+            onPrintAndSave={onPrintAndSave}
+            onSaveOnly={onSaveOnly}
+            storageStatus={storageStatus}
+            showPoweredBy={showPoweredBy}
+            showGstLines={showGstLines}
+            showDividerLines={showDividerLines}
+            addressFontSize={addressFontSize}
+            footerMessage={footerMessage}
+            receiptPlacement={receiptPlacement}
+          />
+        </div>
       </div>
     </div>
   );
