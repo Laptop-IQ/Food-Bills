@@ -1,7 +1,44 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { deleteBillTemplate, getBillTemplates, saveBillTemplate } from "./Hotels/templatesStorage";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import {
+  deleteBillTemplate,
+  getBillTemplates,
+  saveBillTemplate,
+} from "./Hotels/templatesStorage";
 
-const money = (value) => `₹${Number(value || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
+const money = (value) =>
+  `₹${Number(value || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
+const FOCUS =
+  "focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-700/50";
+const NAME_MAX = 60;
+
+const Ri = ({ name, className = "" }) => (
+  <i aria-hidden="true" className={`ri-${name} leading-none ${className}`} />
+);
+
+const formatDate = (iso) => {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+};
+
+const templateTotal = (items) =>
+  (items || []).reduce(
+    (sum, item) => sum + Number(item.qty || 0) * Number(item.rate || 0),
+    0,
+  );
+
+const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 export default function BillTemplateManager({
   open,
@@ -20,31 +57,118 @@ export default function BillTemplateManager({
   const [templates, setTemplates] = useState([]);
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const dialogRef = useRef(null);
+  const inputRef = useRef(null);
+
+  // Light = ivory/forest, dark = neutral. Same map as the saved-bills list.
+  const t = darkMode
+    ? {
+        panel: "bg-neutral-900 text-neutral-100 border-neutral-700",
+        line: "border-neutral-700",
+        divide: "divide-neutral-700",
+        well: "bg-neutral-800/60",
+        row: "hover:bg-neutral-800",
+        muted: "text-neutral-400",
+        input:
+          "bg-neutral-800 border-neutral-700 text-neutral-100 placeholder:text-neutral-500",
+        ghost: "border-neutral-700 text-neutral-100 hover:bg-neutral-700/60",
+        chip: "bg-neutral-800 text-neutral-300",
+        accent: "text-emerald-400",
+        danger: "text-red-300 hover:bg-red-400/10",
+        dangerSolid: "bg-red-600 text-white hover:bg-red-500",
+      }
+    : {
+        panel: "bg-white text-ink border-line",
+        line: "border-line",
+        divide: "divide-line",
+        well: "bg-ivory",
+        row: "hover:bg-ivory",
+        muted: "text-slate-muted",
+        input: "bg-white border-line text-ink placeholder:text-slate-400",
+        ghost: "border-line bg-white text-ink hover:bg-neutral-bg",
+        chip: "bg-neutral-bg text-slate-muted",
+        accent: "text-forest-700",
+        danger: "text-danger hover:bg-danger/10",
+        dangerSolid: "bg-danger text-white hover:brightness-95",
+      };
+
+  const refresh = useCallback(() => setTemplates(getBillTemplates()), []);
 
   useEffect(() => {
     if (!open) return;
-    setTemplates(getBillTemplates());
-    setName(initialName || (currentBill?.title ? `${currentBill.title} Template` : "My Bill Template"));
-  }, [open, currentBill?.title, initialName]);
+    refresh();
+    setPendingDelete(null);
+    setName(
+      initialName ||
+        (currentBill?.title
+          ? `${currentBill.title} template`
+          : "My bill template"),
+    );
+  }, [open, currentBill?.title, initialName, refresh]);
 
   useEffect(() => {
-    if (!open) return;
-    const refresh = () => setTemplates(getBillTemplates());
+    if (!open) return undefined;
     window.addEventListener("bill-templates-updated", refresh);
     return () => window.removeEventListener("bill-templates-updated", refresh);
-  }, [open]);
+  }, [open, refresh]);
+
+  // Escape closes (or cancels an open delete prompt first); Tab stays inside the dialog.
+  useEffect(() => {
+    if (!open) return undefined;
+    const previouslyFocused = document.activeElement;
+    inputRef.current?.focus();
+
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        if (pendingDelete) setPendingDelete(null);
+        else onClose?.();
+        return;
+      }
+      if (e.key !== "Tab" || !dialogRef.current) return;
+      const focusable = dialogRef.current.querySelectorAll(
+        'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+      previouslyFocused?.focus?.();
+    };
+  }, [open, pendingDelete, onClose]);
 
   const currentAmount = useMemo(
-    () => (currentItems || []).reduce((sum, item) => sum + Number(item.qty || 0) * Number(item.rate || 0), 0),
+    () => templateTotal(currentItems),
     [currentItems],
+  );
+  const sorted = useMemo(
+    () =>
+      [...templates].sort((a, b) =>
+        String(b.updatedAt).localeCompare(String(a.updatedAt)),
+      ),
+    [templates],
   );
 
   if (!open) return null;
 
-  const saveCurrent = (forceNew = false) => {
-    const trimmed = name.trim();
-    if (!trimmed) return;
+  const trimmed = name.trim();
 
+  const saveCurrent = (forceNew = false) => {
+    if (!trimmed) return;
     setSaving(true);
     try {
       const saved = saveBillTemplate({
@@ -63,90 +187,250 @@ export default function BillTemplateManager({
     }
   };
 
-  const removeTemplate = (id) => {
-    if (!window.confirm("Delete this template?")) return;
+  const confirmDelete = (id) => {
     setTemplates(deleteBillTemplate(id));
+    setPendingDelete(null);
   };
 
+  const btn = `inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-md px-3.5 text-[13px] font-medium transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-45 ${FOCUS}`;
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/65 p-4 backdrop-blur-md">
-      <div className={`max-h-[92vh] w-full max-w-3xl overflow-hidden rounded-3xl border shadow-[0_30px_100px_rgba(0,0,0,.35)] ${darkMode ? "border-white/10 bg-[#15151a] text-white" : "border-slate-200 bg-white text-slate-900"}`}>
-        <div className={`flex items-center justify-between border-b px-5 py-4 ${darkMode ? "border-white/10" : "border-slate-200"}`}>
-          <div>
-            <h2 className="text-lg font-black">Bill Templates</h2>
-            <p className={`mt-0.5 text-xs ${darkMode ? "text-white/55" : "text-slate-500"}`}>
-              Save your edited bill design and reuse it for future bills.
+    <div
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-ink/45 sm:items-center sm:p-6 print:hidden"
+      onMouseDown={(e) => e.target === e.currentTarget && onClose?.()}
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="bill-templates-title"
+        className={`flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-xl border shadow-[0_24px_64px_rgba(28,31,35,.22)] sm:max-w-2xl sm:rounded-xl ${t.panel}`}
+      >
+        {/* Header */}
+        <div
+          className={`flex items-start justify-between gap-4 border-b px-5 py-4 sm:px-6 ${t.line}`}
+        >
+          <div className="min-w-0">
+            <h2
+              id="bill-templates-title"
+              className="font-display text-[18px] font-semibold tracking-tight"
+            >
+              Bill templates
+            </h2>
+            <p className={`mt-1 text-[13px] leading-5 ${t.muted}`}>
+              Keep a bill’s details and text styling, then start the next one
+              from it.
             </p>
           </div>
-          <button onClick={onClose} className={`rounded-xl px-3 py-2 text-lg ${darkMode ? "hover:bg-white/10" : "hover:bg-slate-100"}`} aria-label="Close">×</button>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className={`-mr-2 -mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-md transition-colors duration-150 sm:h-10 sm:w-10 ${t.ghost
+              .split(" ")
+              .filter((c) => c.startsWith("hover:"))
+              .join(" ")} ${t.muted} ${FOCUS}`}
+          >
+            <Ri name="close-line" className="text-[20px]" />
+          </button>
         </div>
 
-        <div className="max-h-[72vh] overflow-y-auto p-5">
-          <div className={`rounded-2xl border p-4 ${darkMode ? "border-white/10 bg-white/[0.03]" : "border-slate-200 bg-slate-50"}`}>
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <div>
-                <h3 className="font-bold">Save current bill as template</h3>
-                <p className={`mt-1 text-xs ${darkMode ? "text-white/50" : "text-slate-500"}`}>
-                  Current items total: {money(currentAmount)}
-                </p>
-              </div>
-              {editingTemplateId && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold text-amber-700">EDITING TEMPLATE</span>}
-            </div>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Template name"
-                className={`min-w-0 flex-1 rounded-xl border px-3 py-3 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 ${darkMode ? "border-white/10 bg-black/20 text-white placeholder:text-white/30" : "border-slate-200 bg-white"}`}
-              />
-              <button
-                disabled={saving || !name.trim()}
-                onClick={() => saveCurrent(false)}
-                className="whitespace-nowrap rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-600/15 transition hover:-translate-y-0.5 hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0"
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          {/* Save current */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              saveCurrent(false);
+            }}
+            className={`border-b px-5 py-5 sm:px-6 ${t.line} ${t.well}`}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <label
+                htmlFor="bill-template-name"
+                className="text-[13px] font-semibold"
               >
-                {editingTemplateId ? "Update Template" : "Save Template"}
-              </button>
+                Save current bill as a template
+              </label>
               {editingTemplateId && (
-                <button
-                  disabled={saving || !name.trim()}
-                  onClick={() => saveCurrent(true)}
-                  className={`whitespace-nowrap rounded-xl border px-5 py-3 text-sm font-bold transition hover:-translate-y-0.5 disabled:opacity-50 ${darkMode ? "border-white/10 bg-white/[0.03] hover:bg-white/[0.07]" : "border-slate-200 bg-white hover:bg-slate-100"}`}
-                >
-                  Save as New
-                </button>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-gold-500/15 px-2.5 py-1 text-[11px] font-medium text-warning">
+                  <Ri name="edit-2-line" className="text-[13px]" /> Editing a
+                  saved template
+                </span>
               )}
             </div>
-          </div>
+            <p className={`mt-1 text-[12.5px] ${t.muted}`}>
+              {plural((currentItems || []).length, "item")} ·{" "}
+              {money(currentAmount)}
+            </p>
 
-          <div className="mt-5">
-            <div className="mb-3 flex items-center justify-between">
-              <h3 className="font-bold">Saved templates</h3>
-              <span className={`text-xs ${darkMode ? "text-white/45" : "text-slate-500"}`}>{templates.length} total</span>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <input
+                id="bill-template-name"
+                ref={inputRef}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={NAME_MAX}
+                placeholder="e.g. Highway dhaba lunch"
+                autoComplete="off"
+                className={`h-11 w-full min-w-0 rounded-md border px-3 sm:flex-1 text-[14px] transition-colors duration-150 focus:border-forest-700 focus:outline-none focus:ring-2 focus:ring-forest-700/20 sm:h-10 ${t.input}`}
+              />
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  disabled={saving || !trimmed}
+                  className={`${btn} h-11 flex-1 bg-forest-700 text-ivory hover:bg-forest-800 sm:h-10 sm:flex-none`}
+                >
+                  <Ri name="save-3-line" className="text-[18px]" />
+                  {editingTemplateId ? "Update template" : "Save template"}
+                </button>
+                {editingTemplateId && (
+                  <button
+                    type="button"
+                    disabled={saving || !trimmed}
+                    onClick={() => saveCurrent(true)}
+                    className={`${btn} h-11 border sm:h-10 ${t.ghost}`}
+                  >
+                    <Ri name="file-copy-line" className="text-[18px]" />
+                    Save as new
+                  </button>
+                )}
+              </div>
+            </div>
+          </form>
+
+          {/* Saved list */}
+          <section
+            className="px-5 py-5 sm:px-6"
+            aria-labelledby="saved-templates-heading"
+          >
+            <div className="mb-3 flex items-baseline justify-between">
+              <h3
+                id="saved-templates-heading"
+                className="text-[13px] font-semibold"
+              >
+                Saved templates
+              </h3>
+              <span className={`text-[12.5px] ${t.muted}`}>
+                {sorted.length}
+              </span>
             </div>
 
-            {templates.length === 0 ? (
-              <div className={`rounded-2xl border border-dashed p-8 text-center text-sm ${darkMode ? "border-white/10 text-white/45" : "border-slate-300 text-slate-500"}`}>
-                No templates saved yet.
+            {sorted.length === 0 ? (
+              <div
+                className={`flex flex-col items-center rounded-lg border border-dashed px-6 py-10 text-center ${t.line}`}
+              >
+                <span
+                  className={`flex h-11 w-11 items-center justify-center rounded-full ${t.chip}`}
+                >
+                  <Ri name="bookmark-3-line" className="text-[22px]" />
+                </span>
+                <p className="mt-3 text-[14px] font-medium">No templates yet</p>
+                <p className={`mt-1 max-w-xs text-[13px] leading-5 ${t.muted}`}>
+                  Name the bill above and save it. It will show up here, ready
+                  to reuse.
+                </p>
               </div>
             ) : (
-              <div className="space-y-2">
-                {templates.map((template) => (
-                  <div key={template.id} className={`flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between ${darkMode ? "border-white/10 bg-white/[0.02]" : "border-slate-200 bg-white"}`}>
-                    <div className="min-w-0">
-                      <p className="truncate font-bold">{template.name}</p>
-                      <p className={`mt-1 text-xs ${darkMode ? "text-white/45" : "text-slate-500"}`}>
-                        {template.bill?.title || "Bill"} · {template.items?.length || 0} items · Updated {template.updatedAt ? new Date(template.updatedAt).toLocaleDateString("en-IN") : "—"}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 flex-row gap-2">
-                      <button onClick={() => onLoad?.(template)} className="whitespace-nowrap rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-500">Use Template</button>
-                      <button onClick={() => removeTemplate(template.id)} className={`whitespace-nowrap rounded-xl border px-4 py-2.5 text-xs font-bold transition hover:-translate-y-0.5 ${darkMode ? "border-red-400/20 bg-red-400/[0.04] text-red-300 hover:bg-red-400/10" : "border-red-200 text-red-600 hover:bg-red-50"}`}>Delete</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <ul
+                className={`divide-y overflow-hidden rounded-lg border ${t.line} ${t.divide}`}
+              >
+                {sorted.map((template) => {
+                  const itemCount = template.items?.length || 0;
+                  const isCurrent = template.id === editingTemplateId;
+                  const confirming = pendingDelete === template.id;
+                  const updated = formatDate(template.updatedAt);
+
+                  return (
+                    <li
+                      key={template.id}
+                      className={`transition-colors duration-150 ${confirming ? "" : t.row}`}
+                    >
+                      {confirming ? (
+                        <div
+                          className="flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between"
+                          role="alert"
+                        >
+                          <p className="min-w-0 text-[13.5px]">
+                            Delete{" "}
+                            <span className="font-semibold">
+                              “{template.name}”
+                            </span>
+                            ? This can’t be undone.
+                          </p>
+                          <div className="flex shrink-0 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setPendingDelete(null)}
+                              className={`${btn} flex-1 border sm:flex-none ${t.ghost}`}
+                            >
+                              Keep template
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => confirmDelete(template.id)}
+                              className={`${btn} flex-1 sm:flex-none ${t.dangerSolid}`}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-3 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <p className="truncate text-[14px] font-semibold">
+                                {template.name}
+                              </p>
+                              {isCurrent && (
+                                <span
+                                  className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium ${darkMode ? "bg-emerald-400/10 text-emerald-300" : "bg-forest-50 text-forest-700"}`}
+                                >
+                                  In use
+                                </span>
+                              )}
+                            </div>
+                            <p
+                              className={`mt-1 truncate text-[12.5px] ${t.muted}`}
+                            >
+                              {template.bill?.title || "Bill"} ·{" "}
+                              {plural(itemCount, "item")} ·{" "}
+                              {money(templateTotal(template.items))}
+                              {updated && ` · ${updated}`}
+                            </p>
+                          </div>
+                          <div className="flex shrink-0 items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => onLoad?.(template)}
+                              className={`${btn} h-11 flex-1 border sm:h-10 sm:flex-none ${t.ghost}`}
+                            >
+                              <Ri
+                                name="arrow-right-up-line"
+                                className="text-[18px]"
+                              />
+                              Use template
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setPendingDelete(template.id)}
+                              aria-label={`Delete template ${template.name}`}
+                              title="Delete template"
+                              className={`${btn} h-11 w-11 !px-0 sm:h-10 sm:w-10 ${t.danger}`}
+                            >
+                              <Ri
+                                name="delete-bin-6-line"
+                                className="text-[18px]"
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
             )}
-          </div>
+          </section>
         </div>
       </div>
     </div>
