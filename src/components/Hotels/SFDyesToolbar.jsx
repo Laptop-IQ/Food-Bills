@@ -1,3 +1,10 @@
+const FOCUS =
+  "focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-700/50";
+
+const Ri = ({ name, className = "" }) => (
+  <i aria-hidden="true" className={`ri-${name} leading-none ${className}`} />
+);
+
 export default function SFDyesToolbar({
   onBack,
   editing,
@@ -8,290 +15,106 @@ export default function SFDyesToolbar({
   onNew,
   onTemplates,
 }) {
+  const btn = `inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-md px-3 text-[13px] font-medium transition-colors duration-150 active:translate-y-px max-[380px]:px-2.5 ${FOCUS}`;
+  const ghost = `${btn} border border-line bg-white text-ink hover:bg-neutral-bg`;
+  const label = "hidden sm:inline";
+
   return (
-    <div className="w-full max-w-[920px] mb-4 print:hidden">
-      <div
-        className="
-          relative flex items-center justify-between
-          gap-3 rounded-2xl
-          border border-slate-200/80
-          bg-white px-3 py-2.5
-          shadow-[0_4px_20px_rgba(15,23,42,0.06)]
-          sm:px-4
-        "
-      >
-        {/* Left Section */}
-        <div className="flex min-w-0 items-center gap-3">
-          {/* Back */}
-          <button
-            type="button"
-            onClick={onBack}
-            aria-label="Go back"
-            className="
-              group flex h-9 items-center gap-2
-              rounded-xl border border-slate-200
-              bg-white px-3
-              text-xs font-semibold text-slate-600
-              transition-all duration-200
-              hover:border-slate-300
-              hover:bg-slate-50
-              hover:text-slate-900
-              active:scale-95
-              focus:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-indigo-500/30
-            "
-          >
-            <svg
-              className="h-4 w-4 transition-transform group-hover:-translate-x-0.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M19 12H5" />
-              <path d="m12 19-7-7 7-7" />
-            </svg>
+    <div
+      role="toolbar"
+      aria-label="Expense form actions"
+      className="sticky top-14 z-30 mb-4 w-full max-w-[920px] rounded-md border border-line bg-white/95 px-3 py-2.5 shadow-[0_1px_2px_rgba(28,31,35,0.04)] backdrop-blur md:top-3 print:hidden"
+    >
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onBack}
+          aria-label="Go back"
+          title="Back"
+          className={ghost}
+        >
+          <Ri name="arrow-left-line" className="text-[18px]" />
+          <span className={label}>Back</span>
+        </button>
 
-            <span className="hidden sm:inline">Back</span>
-          </button>
+        <div className="mx-1 hidden h-6 w-px bg-line md:block" />
 
-          {/* Divider */}
-          <div className="hidden h-6 w-px bg-slate-200 sm:block" />
-
-          {/* Editing Status */}
-          <div className="hidden items-center gap-2 md:flex">
-            <span
-              className={`
-                h-2 w-2 rounded-full
-                ${editing ? "bg-emerald-500 animate-pulse" : "bg-slate-300"}
-              `}
-            />
-
-            <span className="text-xs font-medium text-slate-500">
-              {editing ? "Editing mode" : "View mode"}
-            </span>
-          </div>
+        <div
+          className="hidden min-w-0 items-center gap-2 md:flex"
+          role="status"
+        >
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${editing ? "bg-success" : "bg-slate-muted/50"}`}
+          />
+          <span className="truncate text-[13px] font-medium text-slate-muted">
+            {editing ? "Editing mode" : "View mode"}
+          </span>
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Edit */}
+        <div className="ml-auto flex items-center gap-2 max-[380px]:gap-1">
           <button
             type="button"
             onClick={onToggleEdit}
             aria-pressed={editing}
             title={editing ? "Done editing" : "Edit form"}
-            className={`
-              group flex h-9 items-center gap-2
-              rounded-xl px-3
-              text-xs font-semibold
-              transition-all duration-200
-              active:scale-95
-              focus:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-indigo-500/30
-              ${
-                editing
-                  ? `
-                    bg-slate-900
-                    text-white
-                    shadow-sm
-                    hover:bg-slate-800
-                  `
-                  : `
-                    border border-slate-200
-                    bg-white
-                    text-slate-700
-                    hover:border-indigo-200
-                    hover:bg-indigo-50
-                    hover:text-indigo-700
-                  `
-              }
-            `}
+            className={`${btn} border ${
+              editing
+                ? "border-forest-700/30 bg-forest-50 text-forest-800 hover:bg-forest-50/70"
+                : "border-line bg-white text-ink hover:bg-neutral-bg"
+            }`}
           >
-            <svg
-              className="h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            >
-              {editing ? (
-                <>
-                  <path d="m5 12 4 4L19 6" />
-                </>
-              ) : (
-                <>
-                  <path d="M12 20h9" />
-                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-                </>
-              )}
-            </svg>
-
-            <span className="hidden sm:inline">
-              {editing ? "Done" : "Edit"}
-            </span>
+            <Ri
+              name={editing ? "check-line" : "edit-2-line"}
+              className="text-[18px]"
+            />
+            <span className={label}>{editing ? "Done" : "Edit"}</span>
           </button>
 
-          {/* Save */}
-          <button
-            type="button"
-            onClick={onSave}
-            title={saveFlash ? "Saved successfully" : "Save form"}
-            className={`
-              group flex h-9 items-center gap-2
-              rounded-xl px-3
-              text-xs font-semibold text-white
-              transition-all duration-200
-              active:scale-95
-              focus:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-emerald-500/30
-              ${
-                saveFlash
-                  ? `
-                    bg-emerald-600
-                    shadow-[0_4px_14px_rgba(16,185,129,0.22)]
-                  `
-                  : `
-                    bg-indigo-600
-                    shadow-[0_4px_14px_rgba(79,70,229,0.20)]
-                    hover:bg-indigo-700
-                  `
-              }
-            `}
-          >
-            <svg
-              className="h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            >
-              {saveFlash ? (
-                <path d="m5 12 4 4L19 6" />
-              ) : (
-                <>
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" />
-                  <path d="M17 21v-8H7v8" />
-                  <path d="M7 3v5h8" />
-                </>
-              )}
-            </svg>
-
-            <span className="hidden sm:inline">
-              {saveFlash ? "Saved" : "Save"}
-            </span>
-          </button>
-
-          {/* Templates */}
           <button
             type="button"
             onClick={onTemplates}
             title="Templates"
-            className="
-              group flex h-9 items-center gap-2
-              rounded-xl
-              border border-slate-200
-              bg-white
-              px-3
-              text-xs font-semibold text-slate-700
-              transition-all duration-200
-              hover:border-indigo-200
-              hover:bg-indigo-50
-              hover:text-indigo-700
-              active:scale-95
-              focus:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-indigo-500/30
-            "
+            aria-label="Templates"
+            className={ghost}
           >
-            <svg
-              className="h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-              <path d="M3 9h18" />
-              <path d="M9 21V9" />
-            </svg>
-
-            <span className="hidden md:inline">Templates</span>
+            <Ri name="bookmark-3-line" className="text-[18px]" />
+            <span className={label}>Templates</span>
           </button>
 
-          {/* Print */}
           <button
             type="button"
             onClick={onPrint}
             title="Print / PDF"
-            className="
-              group flex h-9 items-center gap-2
-              rounded-xl
-              border border-slate-200
-              bg-slate-50
-              px-3
-              text-xs font-semibold text-slate-700
-              transition-all duration-200
-              hover:border-slate-300
-              hover:bg-slate-100
-              hover:text-slate-900
-              active:scale-95
-              focus:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-slate-400/30
-            "
+            aria-label="Print or PDF"
+            className={ghost}
           >
-            <svg
-              className="h-4 w-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-            >
-              <path d="M6 9V2h12v7" />
-              <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-              <path d="M6 14h12v8H6z" />
-            </svg>
-
+            <Ri name="printer-line" className="text-[18px]" />
             <span className="hidden md:inline">Print / PDF</span>
           </button>
 
-          {/* New */}
           <button
             type="button"
             onClick={onNew}
             title="Create new form"
-            className="
-              group flex h-9 items-center gap-2
-              rounded-xl
-              bg-slate-900
-              px-3
-              text-xs font-semibold text-white
-              shadow-sm
-              transition-all duration-200
-              hover:bg-slate-800
-              hover:shadow-md
-              active:scale-95
-              focus:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-slate-900/30
-            "
+            aria-label="New form"
+            className={ghost}
           >
-            <svg
-              className="h-4 w-4 transition-transform duration-200 group-hover:rotate-90"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M12 5v14" />
-              <path d="M5 12h14" />
-            </svg>
+            <Ri name="add-line" className="text-[18px]" />
+            <span className={label}>New</span>
+          </button>
 
-            <span className="hidden sm:inline">New</span>
+          <button
+            type="button"
+            onClick={onSave}
+            title={saveFlash ? "Saved successfully" : "Save form"}
+            aria-label="Save form"
+            className={`${btn} text-ivory ${saveFlash ? "bg-success" : "bg-forest-700 hover:bg-forest-800"}`}
+          >
+            <Ri
+              name={saveFlash ? "check-line" : "save-3-line"}
+              className="text-[18px]"
+            />
+            <span className={label}>{saveFlash ? "Saved" : "Save"}</span>
           </button>
         </div>
       </div>

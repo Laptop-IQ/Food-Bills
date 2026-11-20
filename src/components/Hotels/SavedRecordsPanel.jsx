@@ -121,8 +121,8 @@ export default function SavedRecordsPanel({
       className="
         w-full max-w-[920px] mt-5 print:hidden
         overflow-hidden
-        rounded-2xl
-        border border-slate-200/80
+        rounded-md
+        border border-line
         bg-white
         shadow-[0_8px_30px_rgba(15,23,42,0.06)]
       "
@@ -134,7 +134,7 @@ export default function SavedRecordsPanel({
       <div
         className="
           flex flex-col gap-3
-          border-b border-slate-100
+          border-b border-line
           px-4 py-4
           sm:flex-row
           sm:items-center
@@ -148,9 +148,9 @@ export default function SavedRecordsPanel({
             className="
               flex h-10 w-10 shrink-0
               items-center justify-center
-              rounded-xl
-              bg-indigo-50
-              text-indigo-600
+              rounded-md
+              bg-forest-50
+              text-forest-700
             "
           >
             <svg
@@ -168,9 +168,7 @@ export default function SavedRecordsPanel({
 
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-bold text-slate-900">
-                Saved Records
-              </h2>
+              <h2 className="text-sm font-bold text-ink">Saved Records</h2>
 
               {hasRecords && (
                 <span
@@ -181,11 +179,11 @@ export default function SavedRecordsPanel({
                     items-center
                     justify-center
                     rounded-full
-                    bg-indigo-50
+                    bg-forest-50
                     px-1.5
                     text-[10px]
                     font-bold
-                    text-indigo-600
+                    text-forest-700
                   "
                 >
                   {savedRecords.length}
@@ -204,8 +202,8 @@ export default function SavedRecordsPanel({
             className="
               flex items-center gap-2
               self-start
-              rounded-lg
-              bg-emerald-50
+              rounded-md
+              bg-success/10
               px-2.5 py-1.5
               sm:self-auto
             "
@@ -214,7 +212,7 @@ export default function SavedRecordsPanel({
               className="
                 h-1.5 w-1.5
                 rounded-full
-                bg-emerald-500
+                bg-success
               "
             />
 
@@ -222,7 +220,7 @@ export default function SavedRecordsPanel({
               className="
                 text-[10px]
                 font-semibold
-                text-emerald-700
+                text-success
               "
             >
               Stored in browser
@@ -242,8 +240,8 @@ export default function SavedRecordsPanel({
               mx-auto mb-3
               flex h-12 w-12
               items-center justify-center
-              rounded-2xl
-              bg-slate-50
+              rounded-md
+              bg-neutral-bg/60
               text-slate-400
             "
           >
@@ -261,9 +259,7 @@ export default function SavedRecordsPanel({
             </svg>
           </div>
 
-          <h3 className="text-sm font-semibold text-slate-700">
-            No saved records
-          </h3>
+          <h3 className="text-sm font-semibold text-ink">No saved records</h3>
 
           <p className="mx-auto mt-1 max-w-[360px] text-xs leading-5 text-slate-400">
             Fill out the form and save it to keep your expense record available
@@ -286,7 +282,7 @@ export default function SavedRecordsPanel({
                   className={`
                     group relative
                     flex flex-col gap-3
-                    rounded-xl
+                    rounded-md
                     border
                     p-3
                     transition-all
@@ -298,15 +294,15 @@ export default function SavedRecordsPanel({
                     ${
                       isSelected
                         ? `
-                          border-indigo-200
-                          bg-indigo-50/60
+                          border-forest-700/25
+                          bg-forest-50/60
                           shadow-[0_4px_16px_rgba(79,70,229,0.08)]
                         `
                         : `
-                          border-slate-200
+                          border-line
                           bg-white
-                          hover:border-slate-300
-                          hover:bg-slate-50/70
+                          hover:border-line
+                          hover:bg-neutral-bg/60
                           hover:shadow-sm
                         `
                     }
@@ -322,7 +318,7 @@ export default function SavedRecordsPanel({
                         bottom-3
                         w-0.5
                         rounded-r-full
-                        bg-indigo-600
+                        bg-forest-700
                       "
                     />
                   )}
@@ -344,7 +340,7 @@ export default function SavedRecordsPanel({
                           h-2 w-2
                           shrink-0
                           rounded-full
-                          ${isSelected ? "bg-indigo-500" : "bg-emerald-500"}
+                          ${isSelected ? "bg-forest-700" : "bg-success"}
                         `}
                       />
 
@@ -353,7 +349,7 @@ export default function SavedRecordsPanel({
                           truncate
                           text-sm
                           font-bold
-                          ${isSelected ? "text-indigo-700" : "text-slate-800"}
+                          ${isSelected ? "text-forest-700" : "text-ink"}
                         `}
                       >
                         {r.name || "Unnamed Record"}
@@ -377,7 +373,7 @@ export default function SavedRecordsPanel({
                         <strong
                           className="
                             font-semibold
-                            text-slate-600
+                            text-slate-muted
                           "
                         >
                           {r.voucherNo || "—"}
@@ -391,7 +387,7 @@ export default function SavedRecordsPanel({
                         <strong
                           className="
                             font-semibold
-                            text-slate-600
+                            text-slate-muted
                           "
                         >
                           {r.date || "—"}
@@ -405,7 +401,7 @@ export default function SavedRecordsPanel({
                         <strong
                           className="
                             font-semibold
-                            text-slate-600
+                            text-slate-muted
                           "
                         >
                           {r.savedAt || "—"}
@@ -446,7 +442,7 @@ export default function SavedRecordsPanel({
                           mt-0.5
                           text-sm
                           font-bold
-                          text-emerald-600
+                          text-success
                         "
                       >
                         ₹{r.net || "0"}
@@ -459,7 +455,7 @@ export default function SavedRecordsPanel({
                         hidden
                         h-8
                         w-px
-                        bg-slate-200
+                        bg-neutral-bg
                         sm:block
                       "
                     />
@@ -480,22 +476,22 @@ export default function SavedRecordsPanel({
                           h-8 w-8
                           items-center
                           justify-center
-                          rounded-lg
+                          rounded-md
                           border
-                          border-slate-200
+                          border-line
                           bg-white
-                          text-slate-500
+                          text-slate-muted
                           transition-all
 
-                          hover:border-indigo-200
-                          hover:bg-indigo-50
-                          hover:text-indigo-600
+                          hover:border-forest-700/25
+                          hover:bg-forest-50
+                          hover:text-forest-700
 
                           active:scale-95
 
                           focus:outline-none
                           focus-visible:ring-2
-                          focus-visible:ring-indigo-500/30
+                          focus-visible:ring-forest-700/30
                         "
                       >
                         <svg
@@ -524,22 +520,22 @@ export default function SavedRecordsPanel({
                           h-8 w-8
                           items-center
                           justify-center
-                          rounded-lg
+                          rounded-md
                           border
-                          border-slate-200
+                          border-line
                           bg-white
-                          text-slate-500
+                          text-slate-muted
                           transition-all
 
-                          hover:border-blue-200
-                          hover:bg-blue-50
-                          hover:text-blue-600
+                          hover:border-forest-700/25
+                          hover:bg-forest-50
+                          hover:text-forest-700
 
                           active:scale-95
 
                           focus:outline-none
                           focus-visible:ring-2
-                          focus-visible:ring-blue-500/30
+                          focus-visible:ring-forest-700/30
                         "
                       >
                         <svg
@@ -569,22 +565,22 @@ export default function SavedRecordsPanel({
                           h-8 w-8
                           items-center
                           justify-center
-                          rounded-lg
+                          rounded-md
                           border
-                          border-slate-200
+                          border-line
                           bg-white
                           text-slate-400
                           transition-all
 
-                          hover:border-red-200
-                          hover:bg-red-50
-                          hover:text-red-600
+                          hover:border-danger/30
+                          hover:bg-danger/10
+                          hover:text-danger
 
                           active:scale-95
 
                           focus:outline-none
                           focus-visible:ring-2
-                          focus-visible:ring-red-500/30
+                          focus-visible:ring-danger/30
                         "
                       >
                         <svg

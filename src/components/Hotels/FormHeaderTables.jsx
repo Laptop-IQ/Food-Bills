@@ -3,7 +3,15 @@ import { TD, LBL, HDR } from "./cellStyles";
 import DateTimePicker from "../DateTimePicker";
 
 // Cell with a date/time picker while editing
-function PickCell({ mode, dateFormat, timeFormat, value, onChange, editing, align }) {
+function PickCell({
+  mode,
+  dateFormat,
+  timeFormat,
+  value,
+  onChange,
+  editing,
+  align,
+}) {
   const cell = (
     <Cell value={value} onChange={onChange} editing={editing} align={align} />
   );
@@ -45,10 +53,7 @@ export default function FormHeaderTables({ d, set, editing }) {
           className="
             absolute left-0 top-0
             h-0.5 w-full
-            bg-gradient-to-r
-            from-indigo-600
-            via-violet-500
-            to-indigo-600
+            bg-forest-700
             print:hidden
           "
         />
@@ -154,7 +159,7 @@ export default function FormHeaderTables({ d, set, editing }) {
                   absolute bottom-0 left-1/2
                   h-0.5 w-12
                   -translate-x-1/2
-                  bg-indigo-500
+                  bg-gold-500
                   print:hidden
                 "
               />
@@ -228,10 +233,7 @@ export default function FormHeaderTables({ d, set, editing }) {
             pointer-events-none
             absolute left-0 top-0
             hidden h-0.5 w-full
-            bg-gradient-to-r
-            from-slate-300
-            via-indigo-400
-            to-slate-300
+            bg-line
             print:hidden
           "
         />
