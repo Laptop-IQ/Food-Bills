@@ -517,11 +517,10 @@ export default function SFDyesExpenseForm() {
     <main
       className="
         min-h-screen
-        bg-ivory
-        px-3 py-5
-        font-sans
-        text-ink
-        sm:px-6 sm:py-8
+        bg-slate-100
+        px-2 py-5
+        text-slate-900
+        sm:px-4 sm:py-7
 
         print:bg-white
         print:p-0
@@ -554,27 +553,50 @@ export default function SFDyesExpenseForm() {
           onTemplates={() => setTemplatesOpen(true)}
         />
 
-        {/* Page heading */}
-        <div className="mb-4 flex w-full max-w-[920px] flex-col gap-1 print:hidden sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gold-500">
-              Hotel expense
-            </p>
-            <h1 className="mt-1 font-display text-[28px] font-semibold leading-tight tracking-tight sm:text-[32px]">
-              Expense claim
-            </h1>
-          </div>
-          <p
-            className="flex items-center gap-2 text-[13px] text-slate-muted"
-            role="status"
-          >
+        {/* ─────────────────────────────
+            Status
+        ───────────────────────────── */}
+
+        <div
+          className="
+            mb-3
+            flex
+            w-full
+            max-w-[920px]
+            items-center
+            justify-between
+            print:hidden
+          "
+        >
+          <div className="flex items-center gap-2">
             <span
-              className={`h-1.5 w-1.5 rounded-full ${selectedId ? "bg-forest-700" : "bg-gold-500"}`}
+              className={`
+                h-2
+                w-2
+                rounded-full
+                ${editing ? "animate-pulse bg-emerald-500" : "bg-slate-400"}
+              `}
             />
+
+            <span
+              className="
+                text-[10px]
+                font-medium
+                text-slate-500
+              "
+            >
+              {editing ? "Form is editable" : "Read-only preview"}
+            </span>
+          </div>
+
+          <span
+            className="
+              text-[10px]
+              text-slate-400
+            "
+          >
             {selectedId ? "Saved record selected" : "New record"}
-            <span className="text-slate-muted/50">·</span>
-            {editing ? "Form is editable" : "Read-only preview"}
-          </p>
+          </span>
         </div>
 
         {/* ─────────────────────────────
@@ -588,9 +610,9 @@ export default function SFDyesExpenseForm() {
             max-w-[920px]
             overflow-hidden
             border
-            border-line
+            border-slate-300
             bg-white
-            shadow-[0_12px_32px_rgba(28,31,35,0.10)]
+            shadow-[0_15px_45px_rgba(15,23,42,0.12)]
 
             print:max-w-full
             print:border-0
@@ -605,7 +627,10 @@ export default function SFDyesExpenseForm() {
                 right-0
                 top-0
                 h-0.5
-                bg-forest-700
+                bg-gradient-to-r
+                from-indigo-500
+                via-violet-500
+                to-indigo-500
                 print:hidden
               "
             />
@@ -642,16 +667,55 @@ export default function SFDyesExpenseForm() {
         ───────────────────────────── */}
 
         {!editing && (
-          <p className="mt-4 flex items-center gap-2 text-[13px] text-slate-muted print:hidden">
-            <i
-              aria-hidden="true"
-              className="ri-information-line text-[16px] leading-none text-gold-500"
-            />
+          <div
+            className="
+              mt-3
+              flex
+              items-center
+              gap-2
+              rounded-lg
+              border
+              border-slate-200
+              bg-white/70
+              px-3
+              py-2
+              text-[10px]
+              text-slate-500
+              shadow-sm
+              print:hidden
+            "
+          >
+            <svg
+              className="
+                h-3.5
+                w-3.5
+                text-indigo-500
+              "
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+            >
+              <circle cx="12" cy="12" r="9" />
+
+              <path d="M12 8v4" />
+
+              <path d="M12 16h.01" />
+            </svg>
+
             <span>
-              Select <strong className="font-semibold text-ink">Edit</strong> to
-              modify the form.
+              Click{" "}
+              <strong
+                className="
+                  font-semibold
+                  text-slate-700
+                "
+              >
+                Edit
+              </strong>{" "}
+              to modify the form.
             </span>
-          </p>
+          </div>
         )}
       </div>
 

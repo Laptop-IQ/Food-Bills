@@ -39,7 +39,6 @@ export default function DateTimePicker({
   dateFormat = "DD MMM YYYY",
   timeFormat = "hh:mm A",
   placeholder,
-  darkMode = false,
   inputClass = "",
   children,
 }) {
@@ -172,15 +171,11 @@ export default function DateTimePicker({
     );
   }, [view]);
 
-  const popBg = darkMode
-    ? "bg-[#1a1a1d] border-white/10 text-white"
-    : "bg-white border-slate-200 text-slate-800";
-  const subtle = darkMode ? "text-neutral-400" : "text-slate-400";
-  const hoverBg = darkMode ? "hover:bg-white/10" : "hover:bg-slate-100";
-  const line = darkMode ? "border-white/10" : "border-slate-200";
-  const selectClass = `rounded-lg border px-2 py-1.5 text-sm font-semibold outline-none focus:border-blue-500 ${
-    darkMode ? "bg-[#26262a] border-white/10 text-white" : "bg-white border-slate-200 text-slate-800"
-  }`;
+  const popBg = "bg-white border-slate-200 text-slate-800";
+  const subtle = "text-slate-400";
+  const hoverBg = "hover:bg-slate-100";
+  const line = "border-slate-200";
+  const selectClass = `rounded-lg border px-2 py-1.5 text-sm font-semibold outline-none focus:border-blue-500 bg-white border-slate-200 text-slate-800`;
 
   const popover = open
     ? createPortal(
@@ -335,9 +330,7 @@ export default function DateTimePicker({
                 commit(now);
                 setView({ year: now.getFullYear(), month: now.getMonth() });
               }}
-              className={`rounded-lg px-3 py-1.5 text-sm font-semibold text-blue-600 ${
-                darkMode ? "hover:bg-white/10" : "hover:bg-blue-50"
-              }`}
+              className="rounded-lg px-3 py-1.5 text-sm font-semibold text-blue-600 hover:bg-blue-50"
             >
               {mode === "time" ? "Now" : mode === "date" ? "Today" : "Now"}
             </button>

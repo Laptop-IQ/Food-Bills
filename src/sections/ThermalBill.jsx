@@ -26,7 +26,6 @@ import {
   saveBills,
   saveFontFamily,
   saveFontSize,
-  saveDarkMode,
 } from "../components/api/api";
 
 import SavedBillsListView from "../components/SavedBillsListView";
@@ -58,7 +57,6 @@ export default function ThermalBill() {
 
   const [fontFamily, setFontFamily] = useState("mono");
   const [fontSize, setFontSize] = useState(FONT_SIZE_DEFAULT);
-  const [darkMode, setDarkMode] = useState(false);
 
   // Tax breakdown controls both GST calculation and display.
   const [showGstLines, setShowGstLines] = useState(() => {
@@ -131,9 +129,6 @@ export default function ThermalBill() {
         setFontSize(state.fontSize);
       }
 
-      if (state.darkMode !== null) {
-        setDarkMode(state.darkMode);
-      }
     } catch (error) {
       console.error("Billing state load failed:", error);
     } finally {
@@ -212,14 +207,7 @@ export default function ThermalBill() {
      Theme
   ───────────────────────────────────────────── */
 
-  const toggleDarkMode = useCallback(() => {
-    const next = !darkMode;
-
-    setDarkMode(next);
-    saveDarkMode(next);
-  }, [darkMode, showToast]);
-
-  const theme = getThemeClasses(darkMode);
+  const theme = getThemeClasses();
 
   /* ─────────────────────────────────────────────
      Totals
@@ -557,7 +545,6 @@ export default function ThermalBill() {
   ───────────────────────────────────────────── */
 
   const fontControlProps = {
-    darkMode,
     fontFamily,
     fontSize,
     activeFontCss,
@@ -575,8 +562,6 @@ export default function ThermalBill() {
       <>
         <SavedBillsListView
           theme={theme}
-          darkMode={darkMode}
-          toggleDarkMode={toggleDarkMode}
           startNewBill={startNewBill}
           loading={loading}
           savedBills={savedBills}
@@ -588,7 +573,6 @@ export default function ThermalBill() {
 
         <BillTemplateManager
           open={templateManagerOpen}
-          darkMode={darkMode}
           currentBill={bill}
           currentItems={items}
           currentTextStyles={textStyles}
@@ -648,7 +632,6 @@ export default function ThermalBill() {
       <>
         <BillEditorView
           theme={theme}
-          darkMode={darkMode}
           editingId={editingId}
           bill={bill}
           setBill={setBill}
@@ -673,7 +656,6 @@ export default function ThermalBill() {
 
         <BillTemplateManager
           open={templateManagerOpen}
-          darkMode={darkMode}
           currentBill={bill}
           currentItems={items}
           currentTextStyles={textStyles}

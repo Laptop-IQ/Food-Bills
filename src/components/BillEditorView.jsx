@@ -64,7 +64,6 @@ function Section({ t, title, hint, action, collapsible = false, defaultOpen = tr
 }
 
 export default function BillEditorView({
-    darkMode,
   editingId,
   bill,
   setBill,
@@ -89,27 +88,16 @@ export default function BillEditorView({
   const { grandTotal } = totals;
   const ri = (name, cls = "") => <i aria-hidden="true" className={`ri-${name} leading-none ${cls}`} />;
 
-  const t = darkMode
-    ? {
-        page: "bg-neutral-900 text-neutral-100",
-        nav: "bg-neutral-900/95 border-neutral-700",
-        card: "bg-neutral-800 border-neutral-700",
-        line: "border-neutral-700 divide-neutral-700",
-        muted: "text-neutral-400",
-        ghost: "border-neutral-700 text-neutral-100 hover:bg-neutral-700/60",
-        input: "bg-neutral-900 border-neutral-700 text-neutral-100 placeholder:text-neutral-500",
-        soft: "bg-neutral-900/60",
-      }
-    : {
-        page: "bg-ivory text-ink",
-        nav: "bg-ivory/95 border-line",
-        card: "bg-white border-line",
-        line: "border-line divide-line",
-        muted: "text-slate-muted",
-        ghost: "border-line bg-white text-ink hover:bg-neutral-bg",
-        input: "bg-white border-line text-ink placeholder:text-slate-400",
-        soft: "bg-neutral-bg/60",
-      };
+  const t = {
+    page: "bg-ivory text-ink",
+    nav: "bg-ivory/95 border-line",
+    card: "bg-white border-line",
+    line: "border-line divide-line",
+    muted: "text-slate-muted",
+    ghost: "border-line bg-white text-ink hover:bg-neutral-bg",
+    input: "bg-white border-line text-ink placeholder:text-slate-400",
+    soft: "bg-neutral-bg/60",
+  };
 
   const FOCUS = "focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-700/50";
   const btn = `inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-md px-3.5 text-[13px] font-medium transition-colors duration-150 ${FOCUS}`;
@@ -126,7 +114,7 @@ export default function BillEditorView({
             <span className="hidden sm:inline">Saved bills</span>
           </button>
 
-          <div className={`hidden h-6 w-px sm:block ${darkMode ? "bg-neutral-700" : "bg-line"}`} />
+          <div className="hidden h-6 w-px sm:block bg-line" />
 
           <div className="hidden flex-1 max-[379px]:block" />
 
@@ -136,7 +124,7 @@ export default function BillEditorView({
             </div>
           </div>
 
-          <div className={`hidden h-6 w-px sm:block ${darkMode ? "bg-neutral-700" : "bg-line"}`} />
+          <div className="hidden h-6 w-px sm:block bg-line" />
 
           <div className="flex items-center gap-8">
             <button type="button" onClick={onSaveTemplate} aria-label="Save as template" title="Save as template" className={`${btn} border ${t.ghost} !px-5`}>
@@ -174,7 +162,6 @@ export default function BillEditorView({
                       {field === "date" ? (
                         <DateTimePicker
                           value={bill.date ?? ""}
-                          darkMode={darkMode}
                           inputClass={inputClass}
                           onChange={(date) => setBill({ ...bill, date })}
                         />
@@ -209,7 +196,7 @@ export default function BillEditorView({
               title="Items"
               hint="Products and services on this bill."
               action={
-                <button type="button" onClick={addItem} className={`${btn} bg-ink text-ivory hover:bg-ink/85 ${darkMode ? "!bg-neutral-100 !text-neutral-900" : ""}`}>
+                <button type="button" onClick={addItem} className={`${btn} bg-ink text-ivory hover:bg-ink/85`}>
                   {ri("add-line", "text-[18px]")} Add item
                 </button>
               }
@@ -287,7 +274,7 @@ export default function BillEditorView({
                 onClick={onTogglePaid}
                 aria-pressed={Boolean(bill.paid)}
                 className={`${btn} h-11 justify-start border ${
-                  bill.paid ? "border-success/30 bg-success/10 text-success" : `${darkMode ? "border-neutral-700" : "border-line"} ${t.muted} hover:bg-neutral-bg/60`
+                  bill.paid ? "border-success/30 bg-success/10 text-success" : `border-line ${t.muted} hover:bg-neutral-bg/60`
                 }`}
               >
                 {ri(bill.paid ? "checkbox-circle-fill" : "checkbox-blank-circle-line", "text-[19px]")}

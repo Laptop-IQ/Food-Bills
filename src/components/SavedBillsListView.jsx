@@ -12,8 +12,6 @@ const FOCUS = "focus:outline-none focus-visible:ring-2 focus-visible:ring-forest
 const sortKey = (s) => new Date(s.updatedAt || s.createdAt || 0).getTime() || Number(s.id) || 0;
 
 export default function SavedBillsListView({
-  darkMode,
-  toggleDarkMode,
   startNewBill,
   loading,
   savedBills,
@@ -40,32 +38,19 @@ export default function SavedBillsListView({
     : bills;
 
   // Theme-aware class sets (light = ivory/forest, dark = neutral)
-  const t = darkMode
-    ? {
-        page: "bg-neutral-900 text-neutral-100",
-        card: "bg-neutral-800 border-neutral-700",
-        line: "divide-neutral-700 border-neutral-700",
-        muted: "text-neutral-400",
-        ghost: "border-neutral-700 text-neutral-100 hover:bg-neutral-700/60",
-        input: "bg-neutral-800 border-neutral-700 text-neutral-100 placeholder:text-neutral-500",
-        head: "bg-neutral-800/60",
-        hover: "hover:bg-neutral-800",
-      }
-    : {
-        page: "bg-ivory text-ink",
-        card: "bg-white border-line",
-        line: "divide-line border-line",
-        muted: "text-slate-muted",
-        ghost: "border-line bg-white text-ink hover:bg-neutral-bg",
-        input: "bg-white border-line text-ink placeholder:text-slate-400",
-        head: "bg-neutral-bg/60",
-        hover: "hover:bg-ivory",
-      };
+  const t = {
+    page: "bg-ivory text-ink",
+    card: "bg-white border-line",
+    line: "divide-line border-line",
+    muted: "text-slate-muted",
+    ghost: "border-line bg-white text-ink hover:bg-neutral-bg",
+    input: "bg-white border-line text-ink placeholder:text-slate-400",
+    head: "bg-neutral-bg/60",
+    hover: "hover:bg-ivory",
+  };
 
   const btn = `inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-md px-3.5 text-[13px] font-medium transition-colors duration-150 ${FOCUS}`;
-  const iconBtn = `flex h-9 w-9 items-center justify-center rounded-md transition-colors duration-150 ${FOCUS} ${t.muted} ${
-    darkMode ? "hover:bg-neutral-700 hover:text-white" : "hover:bg-neutral-bg hover:text-ink"
-  }`;
+  const iconBtn = `flex h-9 w-9 items-center justify-center rounded-md transition-colors duration-150 ${FOCUS} ${t.muted} hover:bg-neutral-bg hover:text-ink`;
   const openDashboard = () => (onOpenDashboard ? onOpenDashboard() : navigate("/bill-dashboard"));
   const viewBill = (saved) => {
     startEditBill(saved);
@@ -75,65 +60,93 @@ export default function SavedBillsListView({
   return (
     <div className={`min-h-screen ${t.page}`}>
       <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-8 sm:py-10">
-        {/* Page header */}
-        <header className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gold-500">Thermal bills</p>
-            <h1 className="mt-1.5 font-display text-[28px] font-semibold leading-tight tracking-tight sm:text-[32px]">
-              Saved bills
-            </h1>
-            <p className={`mt-1 text-sm ${t.muted}`}>
-              {loading
-                ? "Loading your bills…"
-                : totalBills === 0
-                  ? "Create a bill and it will be saved here."
-                  : `${totalBills} ${totalBills === 1 ? "bill" : "bills"} · ₹${formatCurrency(totalAmount.toFixed(0))} billed`}
-            </p>
-          </div>
-
+        {/* Utility bar */}
+        <div className="flex items-center justify-between gap-3">
+          <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-gold-500">
+            <Ri name="receipt-line" className="text-[16px]" /> Thermal bills
+          </p>
           <div className="flex items-center gap-2">
-            <button type="button" onClick={startNewBill} className={`${btn} order-first h-11 flex-1 bg-forest-700 text-ivory hover:bg-forest-800 sm:order-last sm:h-10 sm:flex-none`}>
-              <Ri name="add-line" className="text-[18px]" /> New bill
-            </button>
             <button type="button" onClick={onOpenTemplates} aria-label="Templates" title="Templates" className={`${btn} border ${t.ghost} !px-3 sm:!px-3.5`}>
               <Ri name="bookmark-3-line" className="text-[18px]" /> <span className="hidden sm:inline">Templates</span>
             </button>
             <button type="button" onClick={openDashboard} aria-label="Dashboard" title="Dashboard" className={`${btn} border ${t.ghost} !px-3 sm:!px-3.5`}>
               <Ri name="bar-chart-2-line" className="text-[18px]" /> <span className="hidden sm:inline">Dashboard</span>
             </button>
-            <button
-              type="button"
-              onClick={toggleDarkMode}
-              aria-label={darkMode ? "Switch to light theme" : "Switch to dark theme"}
-              title={darkMode ? "Light theme" : "Dark theme"}
-              className={`${btn} w-10 !px-0 border ${t.ghost}`}
-            >
-              <Ri name={darkMode ? "sun-line" : "moon-line"} className="text-[18px]" />
-            </button>
           </div>
-        </header>
+        </div>
 
-        {/* Summary */}
-        {!loading && totalBills > 0 && (
-          <dl className={`mt-7 grid grid-cols-3 overflow-hidden rounded-md border ${t.card} divide-x ${t.line}`}>
-            {[
-              ["Billed", `₹${formatCurrency(totalAmount.toFixed(0))}`],
-              ["Average", `₹${formatCurrency(average.toFixed(0))}`],
-              ["Unpaid", unpaid],
-            ].map(([k, v]) => (
-              <div key={k} className="min-w-0 px-4 py-4 sm:px-6 sm:py-5">
-                <dt className={`truncate text-[11px] font-medium uppercase tracking-[0.1em] ${t.muted}`}>{k}</dt>
-                <dd className="mt-1 truncate font-display text-xl font-semibold tabular-nums tracking-tight sm:text-[26px]">
-                  {v}
-                </dd>
+        {/* Hero */}
+        <section aria-labelledby="home-hero-title" className="mt-8 grid gap-8 sm:mt-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)] lg:items-stretch lg:gap-12">
+          <div className="flex min-w-0 flex-col justify-center">
+            <h1 id="home-hero-title" className="font-display text-[34px] font-semibold leading-[1.08] tracking-[-0.02em] sm:text-[44px]">
+              Thermal bills,<span className="block text-forest-700">ready to print.</span>
+            </h1>
+            <p className={`mt-4 max-w-md text-[15px] leading-6 ${t.muted}`}>
+              Create a receipt, save it, and reuse it as a template whenever the next one comes along.
+            </p>
+            <div className="mt-7 flex flex-col gap-2 sm:flex-row">
+              <button type="button" onClick={startNewBill} className={`${btn} h-11 bg-forest-700 text-ivory hover:bg-forest-800`}>
+                <Ri name="add-line" className="text-[18px]" /> New bill
+              </button>
+              <button type="button" onClick={onOpenTemplates} className={`${btn} h-11 border ${t.ghost}`}>
+                <Ri name="bookmark-3-line" className="text-[18px]" /> Start from a template
+              </button>
+            </div>
+            <p className={`mt-5 text-[12.5px] ${t.muted}`}>
+              {loading
+                ? "Loading your bills…"
+                : totalBills === 0
+                  ? "Nothing saved yet. Your first bill will appear below."
+                  : `${totalBills} ${totalBills === 1 ? "bill" : "bills"} saved on this device`}
+            </p>
+          </div>
+
+          {/* Ledger panel: real totals only */}
+          <aside
+            aria-label="Billing summary"
+            className="flex flex-col justify-between rounded-xl border p-6 sm:p-7 border-forest-800 bg-forest-800 text-ivory"
+          >
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-ivory/60">Total billed</p>
+              {loading ? (
+                <div className="mt-3 h-10 w-44 animate-pulse rounded bg-white/10" aria-busy="true" />
+              ) : (
+                <p className="mt-2 truncate font-display text-[38px] font-semibold tabular-nums leading-none tracking-tight sm:text-[46px]">
+                  ₹{formatCurrency(totalAmount.toFixed(0))}
+                </p>
+              )}
+            </div>
+
+            <dl className="mt-8 grid grid-cols-3 gap-4 border-t pt-5 border-ivory/15">
+              {[
+                ["Bills", totalBills],
+                ["Average", `₹${formatCurrency(average.toFixed(0))}`],
+                ["Unpaid", unpaid],
+              ].map(([k, v]) => (
+                <div key={k} className="min-w-0">
+                  <dt className="truncate text-[11px] font-medium uppercase tracking-[0.1em] text-ivory/60">{k}</dt>
+                  <dd className="mt-1 truncate font-display text-lg font-semibold tabular-nums sm:text-xl">{loading ? "–" : v}</dd>
+                </div>
+              ))}
+            </dl>
+
+            {!loading && bills[0] && (
+              <div className="mt-5 flex items-center justify-between gap-3 rounded-md px-3.5 py-3 text-[13px] bg-white/[0.07]">
+                <span className="min-w-0 truncate">
+                  <span className="text-ivory/60">Latest </span>
+                  <span className="font-mono font-semibold">{bills[0].bill?.billNo || "—"}</span>
+                </span>
+                <span className="shrink-0 font-display font-semibold tabular-nums">₹{formatCurrency(bills[0].grandTotal)}</span>
               </div>
-            ))}
-          </dl>
-        )}
+            )}
+          </aside>
+        </section>
+
+        <h2 className="mt-14 font-display text-[18px] font-semibold tracking-tight sm:mt-16">Saved bills</h2>
 
         {/* Search */}
         {!loading && totalBills > 0 && (
-          <div className="mt-8 flex items-center justify-between gap-4">
+          <div className="mt-4 flex items-center justify-between gap-4">
             <div className="relative w-full sm:w-80">
               <Ri name="search-line" className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[18px] ${t.muted}`} />
               <input
@@ -157,10 +170,10 @@ export default function SavedBillsListView({
             {[0, 1, 2, 3].map((i) => (
               <div key={i} className="flex items-center justify-between p-4">
                 <div className="space-y-2">
-                  <div className={`h-4 w-44 animate-pulse rounded ${darkMode ? "bg-neutral-700" : "bg-neutral-bg"}`} />
-                  <div className={`h-3 w-28 animate-pulse rounded ${darkMode ? "bg-neutral-700" : "bg-neutral-bg"}`} />
+                  <div className="h-4 w-44 animate-pulse rounded bg-neutral-bg" />
+                  <div className="h-3 w-28 animate-pulse rounded bg-neutral-bg" />
                 </div>
-                <div className={`h-5 w-20 animate-pulse rounded ${darkMode ? "bg-neutral-700" : "bg-neutral-bg"}`} />
+                <div className="h-5 w-20 animate-pulse rounded bg-neutral-bg" />
               </div>
             ))}
           </div>
@@ -169,21 +182,13 @@ export default function SavedBillsListView({
         {/* Empty */}
         {!loading && totalBills === 0 && (
           <div className={`mt-8 rounded-md border border-dashed ${t.card} px-6 py-16 text-center`}>
-            <span className={`mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-md ${darkMode ? "bg-neutral-700" : "bg-forest-50 text-forest-700"}`}>
+            <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-md bg-forest-50 text-forest-700">
               <Ri name="file-list-3-line" className="text-[22px]" />
             </span>
             <h2 className="font-display text-lg font-semibold tracking-tight">No saved bills yet</h2>
             <p className={`mx-auto mt-1.5 max-w-sm text-sm ${t.muted}`}>
-              Create your first bill or start from a template. Everything you save appears here.
+              Use New bill above to create your first one. Everything you save appears here.
             </p>
-            <div className="mt-6 flex flex-wrap justify-center gap-2">
-              <button type="button" onClick={startNewBill} className={`${btn} bg-forest-700 text-ivory hover:bg-forest-800`}>
-                <Ri name="add-line" className="text-[18px]" /> New bill
-              </button>
-              <button type="button" onClick={onOpenTemplates} className={`${btn} border ${t.ghost}`}>
-                <Ri name="bookmark-3-line" className="text-[18px]" /> Use a template
-              </button>
-            </div>
           </div>
         )}
 

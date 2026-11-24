@@ -2,25 +2,16 @@ import React from "react";
 import { FONT_FAMILIES } from "../layout/fonts";
 
 export default function FontControls({
-  darkMode,
   fontFamily,
   activeFontCss,
   onFontFamilyChange,
   onReset,
 }) {
-  const panelBg = darkMode
-    ? "bg-[#18181b] border-[#2a2a2e]"
-    : "bg-white border-gray-200";
-  const sublabel = darkMode ? "text-neutral-500" : "text-gray-400";
-  const resetBtn = darkMode
-    ? "text-neutral-500 hover:text-neutral-200 hover:bg-[#27272a] border border-transparent hover:border-[#3a3a3f]"
-    : "text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-200";
-  const selectStyle = darkMode
-    ? "bg-[#1f1f23] border-[#3a3a3f] text-neutral-100 hover:border-[#555] focus:border-blue-500"
-    : "bg-white border-gray-200 text-gray-800 hover:border-gray-400 focus:border-blue-500";
-  const stepBtn = darkMode
-    ? "bg-[#27272a] border border-[#3a3a3f] text-neutral-300 hover:bg-[#333] hover:text-white disabled:opacity-30"
-    : "bg-gray-100 border border-gray-200 text-gray-600 hover:bg-gray-200 hover:text-gray-900 disabled:opacity-30";
+  const panelBg = "bg-white border-gray-200";
+  const sublabel = "text-gray-400";
+  const resetBtn = "text-gray-400 hover:text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-200";
+  const selectStyle = "bg-white border-gray-200 text-gray-800 hover:border-gray-400 focus:border-blue-500";
+  const stepBtn = "bg-gray-100 border border-gray-200 text-gray-600 hover:bg-gray-200 hover:text-gray-900 disabled:opacity-30";
 
   return (
     <div
@@ -50,7 +41,7 @@ export default function FontControls({
         </div>
 
         <div
-          className={`w-px self-stretch ${darkMode ? "bg-[#2a2a2e]" : "bg-gray-100"}`}
+          className="w-px self-stretch bg-gray-100"
         />
 
         <button

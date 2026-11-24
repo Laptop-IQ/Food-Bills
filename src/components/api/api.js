@@ -8,7 +8,6 @@ const STORAGE_KEYS = {
   SERIAL: "lastBillSerial",
   FONT_FAMILY: "billFontFamily",
   FONT_SIZE: "billFontSize",
-  DARK_MODE: "billDarkMode",
 };
 
 // Reads everything needed on startup in one go.
@@ -18,20 +17,17 @@ export function loadBillingState() {
     serial: null,
     fontFamily: null,
     fontSize: null,
-    darkMode: null,
   };
   try {
     const bills = localStorage.getItem(STORAGE_KEYS.BILLS);
     const serial = localStorage.getItem(STORAGE_KEYS.SERIAL);
     const fontFamily = localStorage.getItem(STORAGE_KEYS.FONT_FAMILY);
     const fontSize = localStorage.getItem(STORAGE_KEYS.FONT_SIZE);
-    const darkMode = localStorage.getItem(STORAGE_KEYS.DARK_MODE);
 
     if (bills) state.bills = JSON.parse(bills);
     if (serial) state.serial = parseInt(serial, 10);
     if (fontFamily) state.fontFamily = fontFamily;
     if (fontSize) state.fontSize = parseInt(fontSize, 10);
-    if (darkMode) state.darkMode = darkMode === "true";
   } catch (err) {
     console.error(err);
   }
@@ -73,12 +69,3 @@ export function saveFontSize(size) {
   }
 }
 
-export function saveDarkMode(value) {
-  try {
-    localStorage.setItem(STORAGE_KEYS.DARK_MODE, String(value));
-    return true;
-  } catch (err) {
-    console.error(err);
-    return false;
-  }
-}
